@@ -4,6 +4,14 @@
 
 _crawlers based on webcollector_
 
+## quick start
+-  编写一个爬虫
+  1.  在data/定义数据结构
+  2.  在DataPersistence实现数据数据持久化方法
+  3.  编写crawler
+    -  编写配置
+    -  实现visit()方法
+
 > 详见main.java.JdSearchCrawler，一个爬取京东商品基本信息的简单爬虫,列表页+详情页模式采集  
 
 

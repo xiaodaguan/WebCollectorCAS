@@ -17,7 +17,12 @@ import java.util.List;
 public class DataPersistence {
 
 
-
+    /**
+     * 读取采集过的items, 一般不需要重新实现
+     * @param jdbcTemplate
+     * @param tableName
+     * @return
+     */
     public static List<String> loadItemsCrawled(JdbcTemplate jdbcTemplate, String tableName) {
         String QUERY_SQL = "SELECT MD5 FROM " + tableName;
         return jdbcTemplate.queryForList(QUERY_SQL, String.class);
@@ -26,13 +31,20 @@ public class DataPersistence {
 
     /**
      * 插入数据
-     *
+     * 按照不同类型数据实现
      * @return 成功true 否则false
      */
     public static boolean insertData() {
         return false;
     }
 
+    /**
+     * EbData
+     * @param jdbctemplate
+     * @param data
+     * @param tableName
+     * @return
+     */
     public static boolean insertData(JdbcTemplate jdbctemplate, final EbData data, final String tableName) {
         String INSERT_SQL = "INSERT INTO "+tableName+"(" +
                 "BRAND, TITLE, CONTENT, PRODUCT_IMG, INFO_IMG, " +
