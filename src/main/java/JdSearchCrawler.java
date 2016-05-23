@@ -4,7 +4,7 @@ import cn.edu.hfut.dmic.webcollector.model.Page;
 import cn.edu.hfut.dmic.webcollector.plugin.berkeley.BreadthCrawler;
 import data.EbData;
 import data.SearchKeyInfo;
-import db.DataPersistance;
+import db.DataPersistence;
 import db.JDBCHelper;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
@@ -79,7 +79,7 @@ public class JdSearchCrawler extends BreadthCrawler {
         /*load old items*/
         logger.info("loading crawled items...");
         DB_TABLE = RUN_MODE.equals("run") ? DB_TABLE : DB_TABLE + "_test";
-        crawledItems = DataPersistance.loadItemsCrawled(jdbcTemplate, DB_TABLE);
+        crawledItems = DataPersistence.loadItemsCrawled(jdbcTemplate, DB_TABLE);
         logger.info("crawled item count: {}", crawledItems.size());
 
         /*load search keywords*/
@@ -188,21 +188,24 @@ public class JdSearchCrawler extends BreadthCrawler {
 
             EbData ebData = new EbData();
             fillData(price, sale_num, search_keyword, category_code, brand, title, product_img, diameter, width, info, url, md5, code_num, model, year_month, ebData);
+            saveData(ebData);
 
 
-            // save
-            synchronized (this) {
-                if (!crawledItems.contains(ebData.getMd5())) {
-                    if (DataPersistance.insertData(jdbcTemplate, ebData, DB_TABLE)) {
-                        logger.info("data inserted. {}", ebData.getTitle());
-                        crawledItems.add(ebData.getMd5());
-                    } else logger.error("insert failed. {}", ebData.getTitle());
-                } else {
-                    logger.info("drop old item. {}", ebData.getTitle());
-                }
-            }
         }
 
+    }
+
+    private void saveData(EbData ebData) {
+        synchronized (this) {
+            if (!crawledItems.contains(ebData.getMd5())) {
+                if (DataPersistence.insertData(jdbcTemplate, ebData, DB_TABLE)) {
+                    logger.info("data inserted. {}", ebData.getTitle());
+                    crawledItems.add(ebData.getMd5());
+                } else logger.error("insert failed. {}", ebData.getTitle());
+            } else {
+                logger.info("drop old item. {}", ebData.getTitle());
+            }
+        }
     }
 
     private void fillData(String price, String sale_num, String search_keyword, int category_code, String brand, String title, String product_img, String diameter, String width, String info, String url, String md5, String code_num, String model, String year_month, EbData ebData) {

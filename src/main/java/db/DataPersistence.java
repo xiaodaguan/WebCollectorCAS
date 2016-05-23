@@ -14,7 +14,7 @@ import java.util.List;
  * Created by guanxiaoda on 5/20/16.
  * 数据持久化
  */
-public class DataPersistance {
+public class DataPersistence {
 
 
 
