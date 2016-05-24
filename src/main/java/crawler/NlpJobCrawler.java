@@ -1,9 +1,12 @@
+package crawler;
+
 import cn.edu.hfut.dmic.webcollector.model.CrawlDatums;
 import cn.edu.hfut.dmic.webcollector.model.Page;
 import cn.edu.hfut.dmic.webcollector.plugin.berkeley.BreadthCrawler;
 
 /**
  * Created by guanxiaoda on 5/19/16.
+ *
  */
 public class NlpJobCrawler extends BreadthCrawler{
 
