@@ -17,10 +17,10 @@ gen### Java template
 *.war
 *.ear
 
-eb_jd_search
-NlpJobCrawler
+crawlers
 target
 
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
 
+manifests/

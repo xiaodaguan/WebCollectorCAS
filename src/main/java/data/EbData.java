@@ -6,9 +6,8 @@ import java.sql.Date;
  * Created by guanxiaoda on 5/20/16.
  * 电商类型
  */
-public class EbData {
+public class EbData extends BasicData{
     private String brand;
-    private String title;
     private String content;
     private String product_img;
     private String info_img;
@@ -17,12 +16,10 @@ public class EbData {
     private String price;
     private String sale_num;
     private String name;
-    private String url;
     private String source;
     private String info;
     private Date pubtime;
     private int category_code;
-    private String search_keyword;
     private int site_id;
     private String year_month;
     private int owner;
@@ -30,7 +27,6 @@ public class EbData {
     private String code_num;
     private String brand_full;
     private String company;
-    private String md5;
 
 
     public String getSource() {
@@ -49,13 +45,6 @@ public class EbData {
         this.brand = brand;
     }
 
-    public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
-    }
 
     public String getContent() {
         return content;
@@ -121,13 +110,6 @@ public class EbData {
         this.name = name;
     }
 
-    public String getUrl() {
-        return url;
-    }
-
-    public void setUrl(String url) {
-        this.url = url;
-    }
 
     public String getInfo() {
         return info;
@@ -153,13 +135,6 @@ public class EbData {
         this.category_code = category_code;
     }
 
-    public String getSearch_keyword() {
-        return search_keyword;
-    }
-
-    public void setSearch_keyword(String search_keyword) {
-        this.search_keyword = search_keyword;
-    }
 
     public int getSite_id() {
         return site_id;
@@ -217,11 +192,4 @@ public class EbData {
         this.company = company;
     }
 
-    public String getMd5() {
-        return md5;
-    }
-
-    public void setMd5(String md5) {
-        this.md5 = md5;
-    }
 }
