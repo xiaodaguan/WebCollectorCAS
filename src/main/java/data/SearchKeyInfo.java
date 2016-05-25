@@ -11,6 +11,11 @@ public class SearchKeyInfo {
     private String site_id;
     private String site_name;
 
+    @Override
+    public String toString(){
+        return keyword;
+    }
+
     public int getDbOriginalId() {
         return dbOriginalId;
     }

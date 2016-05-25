@@ -5,7 +5,11 @@ import cn.edu.hfut.dmic.webcollector.model.Page;
 import cn.edu.hfut.dmic.webcollector.plugin.berkeley.BreadthCrawler;
 import data.EbData;
 import data.SearchKeyInfo;
+import db.JDBCHelper;
 import org.jsoup.select.Elements;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.jdbc.core.JdbcTemplate;
 
 import java.io.UnsupportedEncodingException;
 import java.util.List;
@@ -17,6 +21,7 @@ public abstract class BaseCrawler<T> extends BreadthCrawler {
 
     /* <配置> */
 
+    final private static String CRAWLER_NAME = "";
     final private static String DB_URL = "";//172.18.79.3:1521/orcl
     final private static String DB_USER = "";//tire
     final private static String DB_PASSWORD = "";//tire2014
@@ -29,9 +34,14 @@ public abstract class BaseCrawler<T> extends BreadthCrawler {
 
     /* </配置> */
 
+    private static Logger logger = LoggerFactory.getLogger(JdSearchCrawler.class);
 
-    public BaseCrawler(String crawlPath, boolean autoParse) {
+    private static JdbcTemplate jdbcTemplate = null;
+    private List<String> crawledItems = null; // crawled items
+
+    public BaseCrawler(String crawlPath, boolean autoParse) throws UnsupportedEncodingException {
         super(crawlPath, autoParse);
+
     }
 
     protected abstract void generateSeeds(List<SearchKeyInfo> searchKeyInfos) throws UnsupportedEncodingException;

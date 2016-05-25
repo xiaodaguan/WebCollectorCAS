@@ -51,7 +51,7 @@ public class JdSearchCrawler extends BaseCrawler<EbData> {
 
     /* <配置> */
 
-    final private static String CRAWLER_NAME = "jd_search";
+    final private static String CRAWLER_NAME = "eb_jd_search";
     final private static String DB_URL = "172.18.79.3:1521/orcl";
     final private static String DB_USER = "tire";
     final private static String DB_PASSWORD = "tire2014";
@@ -59,8 +59,8 @@ public class JdSearchCrawler extends BaseCrawler<EbData> {
 
     private static String URL_TEMPLATE = "http://search.jd.com/s_new.php?keyword=<KEYWORD>&enc=utf-8&qrst=1&rt=1&stop=1&vt=2&offset=3&page=1";
 
-    final private static String RUN_MODE = "test";//test or run
-    //    final private static String RUN_MODE = "run";
+    //    final private static String RUN_MODE = "test";//test or run
+    final private static String RUN_MODE = "run";
 
     /* </配置> */
 
@@ -77,9 +77,8 @@ public class JdSearchCrawler extends BaseCrawler<EbData> {
         loadCrawledItems();
         List<SearchKeyInfo> searchKeyInfos = loadSearchKeyInfos();
         generateSeeds(searchKeyInfos);
-
-
     }
+
 
     @Override
     protected void generateSeeds(List<SearchKeyInfo> searchKeyInfos) throws UnsupportedEncodingException {/*generate seeds*/
@@ -104,7 +103,7 @@ public class JdSearchCrawler extends BaseCrawler<EbData> {
         List<SearchKeyInfo> searchKeyInfos = new ArrayList<SearchKeyInfo>();
         try {
             searchKeyInfos = db.ORM.searchKeyInfoMapRow(rs);
-            logger.info("read {} search keywords.", searchKeyInfos.size());
+            logger.info("read {} search keywords.\n{}", searchKeyInfos.size(), searchKeyInfos);
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -183,7 +182,8 @@ public class JdSearchCrawler extends BaseCrawler<EbData> {
     }
 
     @Override
-    protected void paging(Page page, CrawlDatums crawlDatums) {CrawlDatum crawlDatum = new CrawlDatum(getPagingUrl(page.getUrl()));
+    protected void paging(Page page, CrawlDatums crawlDatums) {
+        CrawlDatum crawlDatum = new CrawlDatum(getPagingUrl(page.getUrl()));
         crawlDatum.meta("category_code", page.getMetaData().get("category_code"));
         crawlDatum.meta("search_keyword", page.getMetaData().get("search_keyword"));
         crawlDatum.meta("dbid", page.getMetaData().get("dbid"));
@@ -259,6 +259,7 @@ public class JdSearchCrawler extends BaseCrawler<EbData> {
 
     /**
      * 获取下一页url
+     *
      * @param url 当前url
      * @return 下一页url
      */
@@ -300,11 +301,20 @@ public class JdSearchCrawler extends BaseCrawler<EbData> {
         return url;
     }
 
-    public static void main(String[] args) throws Exception {
-        JdSearchCrawler jdsCrawler = new JdSearchCrawler("eb_jd_search", true);
-        jdsCrawler.setThreads(1);
-        jdsCrawler.setExecuteInterval(15 * 1000);
-        jdsCrawler.start(1);
 
+    public static void main(String[] args) throws Exception {
+        while (true) {
+            logger.info("start...");
+
+            JdSearchCrawler jdsCrawler = new JdSearchCrawler(CRAWLER_NAME, true);
+            jdsCrawler.setThreads(1);
+            jdsCrawler.setExecuteInterval(20 * 1000);
+            jdsCrawler.start(1);
+
+            logger.info("wait...");
+            long SLEEP_TIME = 1000 * 3600 * 2;
+            Thread.sleep(SLEEP_TIME);
+
+        }
     }
 }

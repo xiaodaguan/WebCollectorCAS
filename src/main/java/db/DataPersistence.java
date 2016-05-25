@@ -79,7 +79,7 @@ public class DataPersistence {
                     ps.setTimestamp(15, data.getPubtime() != null ? new Timestamp(data.getPubtime().getTime()) : null);
 
                     ps.setInt(16, data.getCategory_code());
-                    ps.setString(17, data.getSearch_keyword());
+                    ps.setString(17, data.getSearchKeyword());
                     ps.setInt(18, data.getSite_id());
                     ps.setString(19, data.getYear_month());
                     ps.setInt(20, data.getOwner());
