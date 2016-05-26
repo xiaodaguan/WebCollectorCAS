@@ -1,6 +1,7 @@
 package db;
 
 import data.EbData;
+import data.NewsData;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementSetter;
 
@@ -19,6 +20,7 @@ public class DataPersistence {
 
     /**
      * 读取采集过的items, 一般不需要重新实现
+     *
      * @param jdbcTemplate
      * @param tableName
      * @return
@@ -32,21 +34,16 @@ public class DataPersistence {
     /**
      * 插入数据
      * 按照不同类型数据实现
+     *
      * @return 成功true 否则false
      */
     public static boolean insertData() {
         return false;
     }
 
-    /**
-     * EbData
-     * @param jdbctemplate
-     * @param data
-     * @param tableName
-     * @return
-     */
+
     public static boolean insertData(JdbcTemplate jdbctemplate, final EbData data, final String tableName) {
-        String INSERT_SQL = "INSERT INTO "+tableName+"(" +
+        String INSERT_SQL = "INSERT INTO " + tableName + "(" +
                 "BRAND, TITLE, CONTENT, PRODUCT_IMG, INFO_IMG, " +
                 "INSERT_TIME, DIAMETER, WIDTH, PRICE, SALE_NUM, " +
                 "NAME, URL, SOURE, INFO, PUBTIME, " +
@@ -78,7 +75,7 @@ public class DataPersistence {
                     ps.setString(14, data.getInfo());
                     ps.setTimestamp(15, data.getPubtime() != null ? new Timestamp(data.getPubtime().getTime()) : null);
 
-                    ps.setInt(16, data.getCategory_code());
+                    ps.setInt(16, data.getCategoryCode());
                     ps.setString(17, data.getSearchKeyword());
                     ps.setInt(18, data.getSite_id());
                     ps.setString(19, data.getYear_month());
@@ -99,6 +96,41 @@ public class DataPersistence {
             return false;
         }
 
+    }
+
+    public static boolean insertData(JdbcTemplate jdbcTemplate, final NewsData data, final String tableName) {
+        String INSERT_SQL = "INSERT INTO " + tableName + "(" +
+                "BRIEF, CATEGORY_CODE, CONTENT, IMG_URL, INSERTTIME, " +
+                "MD5, PUBTIME, SAME_NUM, SAME_URL, SEARCH_KEYWORD, " +
+                "SOURCE, TITLE, URL) VALUES(" +
+                "?,?,?,?,?," +
+                "?,?,?,?,?," +
+                "?,?,?)";
+        try {
+            jdbcTemplate.update(INSERT_SQL, new PreparedStatementSetter() {
+                public void setValues(PreparedStatement ps) throws SQLException {
+                    ps.setString(1, data.getBrief());
+                    ps.setInt(2, data.getCategoryCode());
+                    ps.setString(3, data.getContent());
+                    ps.setString(4, null);
+                    ps.setTimestamp(5, new Timestamp(System.currentTimeMillis()));
+
+                    ps.setString(6, data.getMd5());
+                    ps.setTimestamp(7, data.getPubtime() != null ? new Timestamp(data.getPubtime().getTime()) : null);
+                    ps.setInt(8, data.getSameNum());
+                    ps.setString(9, data.getSameUrl());
+                    ps.setString(10, data.getSearchKeyword());
+
+                    ps.setString(11, data.getSource());
+                    ps.setString(12, data.getTitle());
+                    ps.setString(13, data.getUrl());
+                }
+            });
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 
 }

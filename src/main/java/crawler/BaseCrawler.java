@@ -26,8 +26,9 @@ public abstract class BaseCrawler<T> extends BreadthCrawler {
     final private static String DB_USER = "";//tire
     final private static String DB_PASSWORD = "";//tire2014
     private static String DB_TABLE = "";//eb_data
+    private static String DB_SEARCHKEYWORD_TABLE = "";
 
-    private static String URL_TEMPLATE = "";//http://search.jd.com/s_new.php?keyword=<KEYWORD>&enc=utf-8&qrst=1&rt=1&stop=1&vt=2&offset=3&page=1
+    final private static String URL_TEMPLATE = "";//http://search.jd.com/s_new.php?keyword=<KEYWORD>&enc=utf-8&qrst=1&rt=1&stop=1&vt=2&offset=3&page=1
 
     final private static String RUN_MODE = "";//test or run
     //    final private static String RUN_MODE = "run";

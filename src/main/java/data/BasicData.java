@@ -10,7 +10,15 @@ public class BasicData {
     private String url;
     private String md5;
     private String searchKeyword;
+    private int categoryCode;
 
+    public int getCategoryCode() {
+        return categoryCode;
+    }
+
+    public void setCategoryCode(int categoryCode) {
+        this.categoryCode = categoryCode;
+    }
 
     public String getTitle() {
         return title;

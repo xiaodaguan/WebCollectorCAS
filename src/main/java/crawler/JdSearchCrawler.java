@@ -23,6 +23,7 @@ import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -56,13 +57,15 @@ public class JdSearchCrawler extends BaseCrawler<EbData> {
     final private static String DB_USER = "tire";
     final private static String DB_PASSWORD = "tire2014";
     private static String DB_TABLE = "eb_data";
+    private static String DB_SEARCHKEYWORD_TABLE = "search_keyword";
 
-    private static String URL_TEMPLATE = "http://search.jd.com/s_new.php?keyword=<KEYWORD>&enc=utf-8&qrst=1&rt=1&stop=1&vt=2&offset=3&page=1";
+    final private static String URL_TEMPLATE = "http://search.jd.com/s_new.php?keyword=<KEYWORD>&enc=utf-8&qrst=1&rt=1&stop=1&vt=2&offset=3&page=1";
 
-    //    final private static String RUN_MODE = "test";//test or run
+    //        final private static String RUN_MODE = "test";//test or run
     final private static String RUN_MODE = "run";
 
     /* </配置> */
+
 
     private static Logger logger = LoggerFactory.getLogger(JdSearchCrawler.class);
 
@@ -79,6 +82,28 @@ public class JdSearchCrawler extends BaseCrawler<EbData> {
         generateSeeds(searchKeyInfos);
     }
 
+    @Override
+    protected void loadCrawledItems() {/*load old items*/
+        logger.info("loading crawled items...");
+        DB_TABLE = RUN_MODE.equals("run") ? DB_TABLE : DB_TABLE + "_test";
+        crawledItems = DataPersistence.loadItemsCrawled(jdbcTemplate, DB_TABLE);
+        logger.info("crawled item count: {}", crawledItems.size());
+    }
+
+    @Override
+    protected List<SearchKeyInfo> loadSearchKeyInfos() {/*load search keywords*/
+        logger.info("loading search keywords...");
+        String SEARCH_KEY_SQL = "SELECT id,category_code,keyword,site_id,site_name FROM "+DB_SEARCHKEYWORD_TABLE+" WHERE type LIKE '%;13;%' AND status = 2 ";
+        SqlRowSet rs = jdbcTemplate.queryForRowSet(SEARCH_KEY_SQL);
+        List<SearchKeyInfo> searchKeyInfos = new ArrayList<SearchKeyInfo>();
+        try {
+            searchKeyInfos = db.ORM.searchKeyInfoMapRow(rs);
+            logger.info("read {} search keywords.\n{}", searchKeyInfos.size(), searchKeyInfos);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return searchKeyInfos;
+    }
 
     @Override
     protected void generateSeeds(List<SearchKeyInfo> searchKeyInfos) throws UnsupportedEncodingException {/*generate seeds*/
@@ -96,37 +121,16 @@ public class JdSearchCrawler extends BaseCrawler<EbData> {
         }
     }
 
-    @Override
-    protected List<SearchKeyInfo> loadSearchKeyInfos() {/*load search keywords*/
-        String SEARCH_KEY_SQL = "SELECT id,category_code,keyword,site_id,site_name FROM search_keyword WHERE type LIKE '%;13;%' AND status = 2 ";
-        SqlRowSet rs = jdbcTemplate.queryForRowSet(SEARCH_KEY_SQL);
-        List<SearchKeyInfo> searchKeyInfos = new ArrayList<SearchKeyInfo>();
-        try {
-            searchKeyInfos = db.ORM.searchKeyInfoMapRow(rs);
-            logger.info("read {} search keywords.\n{}", searchKeyInfos.size(), searchKeyInfos);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return searchKeyInfos;
-    }
 
-    @Override
-    protected void loadCrawledItems() {/*load old items*/
-        logger.info("loading crawled items...");
-        DB_TABLE = RUN_MODE.equals("run") ? DB_TABLE : DB_TABLE + "_test";
-        crawledItems = DataPersistence.loadItemsCrawled(jdbcTemplate, DB_TABLE);
-        logger.info("crawled item count: {}", crawledItems.size());
-    }
-
-    public void visit(Page page, CrawlDatums crawlDatums) {
+    public void visit(Page page, CrawlDatums next) {
         if (isListPage(page)) {
-            Elements elements = parseList(page, crawlDatums);
+            Elements elements = parseList(page, next);
 
 
             // paging
             if (elements.size() > 0) {
 
-                paging(page, crawlDatums);
+                paging(page, next);
 
             }
 
@@ -134,12 +138,54 @@ public class JdSearchCrawler extends BaseCrawler<EbData> {
             // parse item
             EbData ebData = parseDetailPage(page);
 
-
-            saveData(ebData);
+            //save
+            if (ebData.getTitle() != null && ebData.getPrice() != null) saveData(ebData);
 
 
         }
 
+    }
+
+    @Override
+    protected Elements parseList(Page page, CrawlDatums crawlDatums) {// parse list
+        Elements elements = page.doc().select(" div.gl-i-wrap");
+        for (Element element : elements) {
+
+            String priceFromList = element.select("div.p-price strong[data-price]").attr("data-price");
+            String commCountFromList = element.select("div.p-commit a[href]").text();
+            String categoryCodeFromMeta = page.getMetaData().get("category_code");
+            String searchKeywordFromMeta = page.getMetaData().get("search_keyword");
+
+            String url = formatUrl(element.select("div.p-img>a").attr("href"));
+            if (crawledItems.contains(MD5.MD5(url))) {
+                logger.info("skip crawled item {}", url);
+                continue;
+            }
+
+
+            CrawlDatum crawlDatum = new CrawlDatum(url);
+
+            crawlDatum.meta("price", priceFromList);
+            crawlDatum.meta("commCount", commCountFromList);
+            crawlDatum.meta("category_code", categoryCodeFromMeta);
+            crawlDatum.meta("search_keyword", searchKeywordFromMeta);
+
+            crawlDatums.add(crawlDatum);
+
+        }
+        return elements;
+    }
+
+    @Override
+    protected void paging(Page page, CrawlDatums crawlDatums) {
+
+
+        CrawlDatum crawlDatum = new CrawlDatum(getPagingUrl(page.getUrl()));
+        crawlDatum.meta("category_code", page.getMetaData().get("category_code"));
+        crawlDatum.meta("search_keyword", page.getMetaData().get("search_keyword"));
+        crawlDatum.meta("dbid", page.getMetaData().get("dbid"));
+        crawlDatum.meta("site_id", page.getMetaData().get("site_id"));
+        crawlDatums.add(crawlDatum);
     }
 
     @Override
@@ -181,43 +227,6 @@ public class JdSearchCrawler extends BaseCrawler<EbData> {
         return ebData;
     }
 
-    @Override
-    protected void paging(Page page, CrawlDatums crawlDatums) {
-        CrawlDatum crawlDatum = new CrawlDatum(getPagingUrl(page.getUrl()));
-        crawlDatum.meta("category_code", page.getMetaData().get("category_code"));
-        crawlDatum.meta("search_keyword", page.getMetaData().get("search_keyword"));
-        crawlDatum.meta("dbid", page.getMetaData().get("dbid"));
-        crawlDatum.meta("site_id", page.getMetaData().get("site_id"));
-        crawlDatums.add(crawlDatum);
-    }
-
-    @Override
-    protected Elements parseList(Page page, CrawlDatums crawlDatums) {// parse list
-        Elements elements = page.doc().select(" div.gl-i-wrap");
-        for (Element element : elements) {
-
-            String priceFromList = element.select("div.p-price strong[data-price]").attr("data-price");
-            String commCountFromList = element.select("div.p-commit a[href]").text();
-            String categoryCodeFromMeta = page.getMetaData().get("category_code");
-            String searchKeywordFromMeta = page.getMetaData().get("search_keyword");
-
-            String url = formatUrl(element.select("div.p-img>a").attr("href"));
-            if (crawledItems.contains(MD5.MD5(url))) {
-                logger.info("skip crawled item {}", url);
-                continue;
-            }
-
-            CrawlDatum crawlDatum = new CrawlDatum(url);
-
-            crawlDatum.meta("price", priceFromList);
-            crawlDatum.meta("commCount", commCountFromList);
-            crawlDatum.meta("category_code", categoryCodeFromMeta);
-            crawlDatum.meta("search_keyword", searchKeywordFromMeta);
-
-            crawlDatums.add(crawlDatum);
-        }
-        return elements;
-    }
 
     @Override
     protected boolean isDetailPage(Page page) {return page.getUrl().contains("item.jd.com");}
@@ -251,7 +260,7 @@ public class JdSearchCrawler extends BaseCrawler<EbData> {
         ebData.setSale_num(sale_num);
         ebData.setInfo(info);
         ebData.setSearchKeyword(search_keyword);
-        ebData.setCategory_code(category_code);
+        ebData.setCategoryCode(category_code);
         ebData.setModel(model);
         ebData.setCode_num(code_num);
         ebData.setYear_month(year_month);
@@ -308,8 +317,8 @@ public class JdSearchCrawler extends BaseCrawler<EbData> {
 
             JdSearchCrawler jdsCrawler = new JdSearchCrawler(CRAWLER_NAME, true);
             jdsCrawler.setThreads(1);
-            jdsCrawler.setExecuteInterval(20 * 1000);
-            jdsCrawler.start(1);
+            jdsCrawler.setExecuteInterval(15 * 1000);
+            jdsCrawler.start(16);
 
             logger.info("wait...");
             long SLEEP_TIME = 1000 * 3600 * 2;
