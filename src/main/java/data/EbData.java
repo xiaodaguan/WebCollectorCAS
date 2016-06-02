@@ -19,7 +19,6 @@ public class EbData extends BasicData{
     private String source;
     private String info;
     private Date pubtime;
-    private int category_code;
     private int site_id;
     private String year_month;
     private int owner;
@@ -127,13 +126,6 @@ public class EbData extends BasicData{
         this.pubtime = pubtime;
     }
 
-    public int getCategory_code() {
-        return category_code;
-    }
-
-    public void setCategory_code(int category_code) {
-        this.category_code = category_code;
-    }
 
 
     public int getSite_id() {

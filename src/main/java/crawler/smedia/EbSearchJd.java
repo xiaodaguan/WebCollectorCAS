@@ -1,9 +1,9 @@
-package crawler;
+package crawler.smedia;
 
 import cn.edu.hfut.dmic.webcollector.model.CrawlDatum;
 import cn.edu.hfut.dmic.webcollector.model.CrawlDatums;
 import cn.edu.hfut.dmic.webcollector.model.Page;
-import cn.edu.hfut.dmic.webcollector.plugin.berkeley.BreadthCrawler;
+import crawler.BaseCrawler;
 import data.EbData;
 import data.SearchKeyInfo;
 import db.DataPersistence;
@@ -47,41 +47,53 @@ import java.util.regex.Pattern;
  * <p/>
  * 数据库初始连接数没有指定,最大连接数30,按需更改
  */
-public class JdSearchCrawler extends BaseCrawler<EbData> {
+public class EbSearchJd extends BaseCrawler<EbData> {
 
     /* <配置> */
 
-    final private static String CRAWLER_NAME = "eb_jd_search";
+    final private static String CRAWLER_NAME = EbSearchJd.class.getName();
     final private static String DB_URL = "172.18.79.3:1521/orcl";
     final private static String DB_USER = "tire";
     final private static String DB_PASSWORD = "tire2014";
     private static String DB_TABLE = "eb_data";
+    private static String DB_SEARCHKEYWORD_TABLE = "search_keyword";
 
-    private static String URL_TEMPLATE = "http://search.jd.com/s_new.php?keyword=<KEYWORD>&enc=utf-8&qrst=1&rt=1&stop=1&vt=2&offset=3&page=1";
+    final private static String URL_TEMPLATE = "http://search.jd.com/s_new.php?keyword=<KEYWORD>&enc=utf-8&qrst=1&rt=1&stop=1&vt=2&offset=3&page=1";
 
-    //    final private static String RUN_MODE = "test";//test or run
+    //        final private static String RUN_MODE = "test";//test or run
     final private static String RUN_MODE = "run";
 
     /* </配置> */
 
-    private static Logger logger = LoggerFactory.getLogger(JdSearchCrawler.class);
+
+    private static Logger logger = LoggerFactory.getLogger(EbSearchJd.class);
 
     private static JdbcTemplate jdbcTemplate = null;
     private List<String> crawledItems = null; // crawled items
 
-    public JdSearchCrawler(String crawlPath, boolean autoParse) throws UnsupportedEncodingException {
+    public EbSearchJd(String crawlPath, boolean autoParse) throws UnsupportedEncodingException {
         super(crawlPath, autoParse);
         jdbcTemplate = JDBCHelper.createOracleTemplate(CRAWLER_NAME, "jdbc:oracle:thin:@" + DB_URL, DB_USER, DB_PASSWORD, 5, 30);
 
+        crawledItems = loadCrawledItems();
+        List<SearchKeyInfo> searchKeyInfos = DataPersistence.loadSearchKeyInfos(jdbcTemplate, DB_SEARCHKEYWORD_TABLE,7);
+        CrawlDatums seeds = generateSeeds(searchKeyInfos);
+        this.addSeed(seeds);
+    }
 
-        loadCrawledItems();
-        List<SearchKeyInfo> searchKeyInfos = loadSearchKeyInfos();
-        generateSeeds(searchKeyInfos);
+    @Override
+    protected List<String> loadCrawledItems() {/*load old items*/
+        logger.info("loading crawled items...");
+        DB_TABLE = RUN_MODE.equals("run") ? DB_TABLE : DB_TABLE + "_test";
+        List<String> crawled = DataPersistence.loadItemsCrawled(jdbcTemplate, DB_TABLE);
+        logger.info("crawled item count: {}", crawled.size());
+        return crawled;
     }
 
 
     @Override
-    protected void generateSeeds(List<SearchKeyInfo> searchKeyInfos) throws UnsupportedEncodingException {/*generate seeds*/
+    protected CrawlDatums generateSeeds(List<SearchKeyInfo> searchKeyInfos) throws UnsupportedEncodingException {/*generate seeds*/
+        CrawlDatums seeds = new CrawlDatums();
         for (SearchKeyInfo ski : searchKeyInfos) {
             String url = URL_TEMPLATE.replace("<KEYWORD>", URLEncoder.encode(ski.getKeyword(), "utf-8"));
             CrawlDatum cd = new CrawlDatum(url);
@@ -92,41 +104,21 @@ public class JdSearchCrawler extends BaseCrawler<EbData> {
             cd.meta("site_id", ski.getSite_id());
             cd.meta("site_name", ski.getSite_name());
 
-            this.addSeed(cd);
+            seeds.add(cd);
         }
+        return seeds;
     }
 
-    @Override
-    protected List<SearchKeyInfo> loadSearchKeyInfos() {/*load search keywords*/
-        String SEARCH_KEY_SQL = "SELECT id,category_code,keyword,site_id,site_name FROM search_keyword WHERE type LIKE '%;13;%' AND status = 2 ";
-        SqlRowSet rs = jdbcTemplate.queryForRowSet(SEARCH_KEY_SQL);
-        List<SearchKeyInfo> searchKeyInfos = new ArrayList<SearchKeyInfo>();
-        try {
-            searchKeyInfos = db.ORM.searchKeyInfoMapRow(rs);
-            logger.info("read {} search keywords.\n{}", searchKeyInfos.size(), searchKeyInfos);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return searchKeyInfos;
-    }
 
-    @Override
-    protected void loadCrawledItems() {/*load old items*/
-        logger.info("loading crawled items...");
-        DB_TABLE = RUN_MODE.equals("run") ? DB_TABLE : DB_TABLE + "_test";
-        crawledItems = DataPersistence.loadItemsCrawled(jdbcTemplate, DB_TABLE);
-        logger.info("crawled item count: {}", crawledItems.size());
-    }
-
-    public void visit(Page page, CrawlDatums crawlDatums) {
+    public void visit(Page page, CrawlDatums next) {
         if (isListPage(page)) {
-            Elements elements = parseList(page, crawlDatums);
+            Elements elements = parseList(page, next);
 
 
             // paging
-            if (elements.size() > 0) {
+            if (elements!=null) {
 
-                paging(page, crawlDatums);
+                paging(page, next);
 
             }
 
@@ -134,12 +126,54 @@ public class JdSearchCrawler extends BaseCrawler<EbData> {
             // parse item
             EbData ebData = parseDetailPage(page);
 
-
-            saveData(ebData);
+            //save
+            if (ebData.getTitle() != null && ebData.getPrice() != null) saveData(ebData);
 
 
         }
 
+    }
+
+    @Override
+    protected Elements parseList(Page page, CrawlDatums crawlDatums) {// parse list
+        Elements elements = page.doc().select(" div.gl-i-wrap");
+        for (Element element : elements) {
+
+            String priceFromList = element.select("div.p-price strong[data-price]").attr("data-price");
+            String commCountFromList = element.select("div.p-commit a[href]").text();
+            String categoryCodeFromMeta = page.getMetaData().get("category_code");
+            String searchKeywordFromMeta = page.getMetaData().get("search_keyword");
+
+            String url = formatUrl(element.select("div.p-img>a").attr("href"));
+            if (crawledItems.contains(MD5.MD5(url))) {
+                logger.info("skip crawled item {}", url);
+                continue;
+            }
+
+
+            CrawlDatum crawlDatum = new CrawlDatum(url);
+
+            crawlDatum.meta("price", priceFromList);
+            crawlDatum.meta("commCount", commCountFromList);
+            crawlDatum.meta("category_code", categoryCodeFromMeta);
+            crawlDatum.meta("search_keyword", searchKeywordFromMeta);
+
+            crawlDatums.add(crawlDatum);
+
+        }
+        return elements;
+    }
+
+    @Override
+    protected void paging(Page page, CrawlDatums crawlDatums) {
+
+
+        CrawlDatum crawlDatum = new CrawlDatum(getPagingUrl(page.getUrl()));
+        crawlDatum.meta("category_code", page.getMetaData().get("category_code"));
+        crawlDatum.meta("search_keyword", page.getMetaData().get("search_keyword"));
+        crawlDatum.meta("dbid", page.getMetaData().get("dbid"));
+        crawlDatum.meta("site_id", page.getMetaData().get("site_id"));
+        crawlDatums.add(crawlDatum);
     }
 
     @Override
@@ -181,43 +215,6 @@ public class JdSearchCrawler extends BaseCrawler<EbData> {
         return ebData;
     }
 
-    @Override
-    protected void paging(Page page, CrawlDatums crawlDatums) {
-        CrawlDatum crawlDatum = new CrawlDatum(getPagingUrl(page.getUrl()));
-        crawlDatum.meta("category_code", page.getMetaData().get("category_code"));
-        crawlDatum.meta("search_keyword", page.getMetaData().get("search_keyword"));
-        crawlDatum.meta("dbid", page.getMetaData().get("dbid"));
-        crawlDatum.meta("site_id", page.getMetaData().get("site_id"));
-        crawlDatums.add(crawlDatum);
-    }
-
-    @Override
-    protected Elements parseList(Page page, CrawlDatums crawlDatums) {// parse list
-        Elements elements = page.doc().select(" div.gl-i-wrap");
-        for (Element element : elements) {
-
-            String priceFromList = element.select("div.p-price strong[data-price]").attr("data-price");
-            String commCountFromList = element.select("div.p-commit a[href]").text();
-            String categoryCodeFromMeta = page.getMetaData().get("category_code");
-            String searchKeywordFromMeta = page.getMetaData().get("search_keyword");
-
-            String url = formatUrl(element.select("div.p-img>a").attr("href"));
-            if (crawledItems.contains(MD5.MD5(url))) {
-                logger.info("skip crawled item {}", url);
-                continue;
-            }
-
-            CrawlDatum crawlDatum = new CrawlDatum(url);
-
-            crawlDatum.meta("price", priceFromList);
-            crawlDatum.meta("commCount", commCountFromList);
-            crawlDatum.meta("category_code", categoryCodeFromMeta);
-            crawlDatum.meta("search_keyword", searchKeywordFromMeta);
-
-            crawlDatums.add(crawlDatum);
-        }
-        return elements;
-    }
 
     @Override
     protected boolean isDetailPage(Page page) {return page.getUrl().contains("item.jd.com");}
@@ -251,7 +248,7 @@ public class JdSearchCrawler extends BaseCrawler<EbData> {
         ebData.setSale_num(sale_num);
         ebData.setInfo(info);
         ebData.setSearchKeyword(search_keyword);
-        ebData.setCategory_code(category_code);
+        ebData.setCategoryCode(category_code);
         ebData.setModel(model);
         ebData.setCode_num(code_num);
         ebData.setYear_month(year_month);
@@ -306,10 +303,10 @@ public class JdSearchCrawler extends BaseCrawler<EbData> {
         while (true) {
             logger.info("start...");
 
-            JdSearchCrawler jdsCrawler = new JdSearchCrawler(CRAWLER_NAME, true);
+            EbSearchJd jdsCrawler = new EbSearchJd(CRAWLER_NAME, true);
             jdsCrawler.setThreads(1);
-            jdsCrawler.setExecuteInterval(20 * 1000);
-            jdsCrawler.start(1);
+            jdsCrawler.setExecuteInterval(15 * 1000);
+            jdsCrawler.start(16);
 
             logger.info("wait...");
             long SLEEP_TIME = 1000 * 3600 * 2;
