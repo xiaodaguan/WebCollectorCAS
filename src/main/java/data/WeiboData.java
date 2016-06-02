@@ -8,7 +8,7 @@ import java.sql.Date;
  */
 public class WeiboData extends BasicData{
     private Date pubtime;
-    private int userId;
+    private long userId;
     private int commentCount;
     private int rttCount;
     private String mid;
@@ -19,7 +19,7 @@ public class WeiboData extends BasicData{
     private String authorImg;
     private String content;
     private String source;
-    private String siteId;
+    private int siteId;
     private String imgUrl;
     private int reliability;
     private String gps;
@@ -42,11 +42,11 @@ public class WeiboData extends BasicData{
         this.pubtime = pubtime;
     }
 
-    public int getUserId() {
+    public long getUserId() {
         return userId;
     }
 
-    public void setUserId(int userId) {
+    public void setUserId(long userId) {
         this.userId = userId;
     }
 
@@ -130,11 +130,12 @@ public class WeiboData extends BasicData{
         this.source = source;
     }
 
-    public String getSiteId() {
+    public int getSiteId() {
+
         return siteId;
     }
 
-    public void setSiteId(String siteId) {
+    public void setSiteId(int siteId) {
         this.siteId = siteId;
     }
 

@@ -1,9 +1,12 @@
-package crawler;
+package crawler.smedia;
 
 import cn.edu.hfut.dmic.contentextractor.ContentExtractor;
 import cn.edu.hfut.dmic.webcollector.model.CrawlDatum;
 import cn.edu.hfut.dmic.webcollector.model.CrawlDatums;
 import cn.edu.hfut.dmic.webcollector.model.Page;
+import crawler.BaseCrawler;
+import crawlerlog.log.CLog;
+import crawlerlog.log.CLogFactory;
 import data.NewsData;
 import data.SearchKeyInfo;
 import db.DataPersistence;
@@ -13,7 +16,6 @@ import org.jsoup.select.Elements;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.support.rowset.SqlRowSet;
 import util.MD5;
 import util.re;
 import util.time;
@@ -21,21 +23,26 @@ import util.time;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.sql.Date;
-import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Created by guanxiaoda on 5/25/16.
+ *
  */
-public class BaiduNewsCrawler extends BaseCrawler<NewsData> {
-/* <配置> */
+public class NewsSearchBaidu extends BaseCrawler<NewsData> {
+    /* <配置> */
+    static {
+        CLogFactory.configure("../../config/crawlerlog.properties");
+    }
+    final static CLog cLogger = CLogFactory.getLogger("http://172.18.79.2:8080/crawlerlogserver","cjr000001","192.168.31.123");
 
-    final private static String CRAWLER_NAME = "news_baidu_search";
+
+    final private static String CRAWLER_NAME = NewsSearchBaidu.class.getName()+"_jinrong";
     final private static String DB_URL = "172.18.79.3:1521/orcl";
     final private static String DB_USER = "jinrong";
     final private static String DB_PASSWORD = "jinrong";
     private static String DB_TABLE = "news_data";
+    private static String DB_SEARCHKEYWORD_TABLE = "search_keyword";
 
     final private static String URL_TEMPLATE = "http://news.baidu.com/ns?word=<KEYWORD>&pn=0&cl=2&ct=0&tn=news&rn=20&ie=utf-8&bt=0&et=0&rsv_page=1";
 
@@ -45,22 +52,26 @@ public class BaiduNewsCrawler extends BaseCrawler<NewsData> {
     /* </配置> */
 
 
-    private static Logger logger = LoggerFactory.getLogger(BaiduNewsCrawler.class);
+    private static Logger logger = LoggerFactory.getLogger(NewsSearchBaidu.class);
 
     private static JdbcTemplate jdbcTemplate = null;
     private List<String> crawledItems = null; // crawled items
 
 
-    public BaiduNewsCrawler(String crawlPath, boolean autoParse) throws UnsupportedEncodingException {
+    public NewsSearchBaidu(String crawlPath, boolean autoParse) throws UnsupportedEncodingException {
         super(crawlPath, autoParse);
+
+        cLogger.start("","news_search_baidu_jinrong");
         jdbcTemplate = JDBCHelper.createOracleTemplate(CRAWLER_NAME, "jdbc:oracle:thin:@" + DB_URL, DB_USER, DB_PASSWORD, 5, 30);
-        loadCrawledItems();
-        List<SearchKeyInfo> searchKeyInfos = loadSearchKeyInfos();
-        generateSeeds(searchKeyInfos);
+        crawledItems = loadCrawledItems();
+        List<SearchKeyInfo> searchKeyInfos = DataPersistence.loadSearchKeyInfos(jdbcTemplate, DB_SEARCHKEYWORD_TABLE,1);
+        CrawlDatums seeds = generateSeeds(searchKeyInfos);
+        this.addSeed(seeds);
     }
 
     @Override
-    protected void generateSeeds(List<SearchKeyInfo> searchKeyInfos) throws UnsupportedEncodingException {
+    protected CrawlDatums generateSeeds(List<SearchKeyInfo> searchKeyInfos) throws UnsupportedEncodingException {
+        CrawlDatums seeds = new CrawlDatums();
         for (SearchKeyInfo ski : searchKeyInfos) {
             String url = URL_TEMPLATE.replace("<KEYWORD>", URLEncoder.encode(ski.getKeyword(), "utf-8"));
             CrawlDatum cd = new CrawlDatum(url);
@@ -71,32 +82,22 @@ public class BaiduNewsCrawler extends BaseCrawler<NewsData> {
             cd.meta("site_id", ski.getSite_id());
             cd.meta("site_name", ski.getSite_name());
 
-            this.addSeed(cd);
+            seeds.add(cd);
             if (RUN_MODE.equals("test")) break;
         }
+        return seeds;
     }
 
 
-    @Override
-    protected List<SearchKeyInfo> loadSearchKeyInfos() {
-        String SEARCH_KEY_SQL = "SELECT id,category_code,keyword,site_id,site_name FROM search_keyword WHERE type LIKE '%;1;%' AND status = 2 ";
-        SqlRowSet rs = jdbcTemplate.queryForRowSet(SEARCH_KEY_SQL);
-        List<SearchKeyInfo> searchKeyInfos = new ArrayList<SearchKeyInfo>();
-        try {
-            searchKeyInfos = db.ORM.searchKeyInfoMapRow(rs);
-            logger.info("read {} search keywords.\n{}", searchKeyInfos.size(), searchKeyInfos);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return searchKeyInfos;
-    }
+
 
     @Override
-    protected void loadCrawledItems() {
+    protected List<String> loadCrawledItems() {
         logger.info("loading crawled items ...");
         DB_TABLE = RUN_MODE.equals("run") ? DB_TABLE : DB_TABLE + "_test";
-        crawledItems = DataPersistence.loadItemsCrawled(jdbcTemplate, DB_TABLE);
-        logger.info("crawled item count: {}", crawledItems.size());
+        List<String> crawled = DataPersistence.loadItemsCrawled(jdbcTemplate, DB_TABLE);
+        logger.info("crawled item count: {}", crawled.size());
+        return crawled;
     }
 
 
@@ -239,7 +240,7 @@ public class BaiduNewsCrawler extends BaseCrawler<NewsData> {
 
 
             // paging
-            if (elements.size() > 0) {
+            if (elements!=null) {
 
                 paging(page, next);
 
@@ -258,10 +259,19 @@ public class BaiduNewsCrawler extends BaseCrawler<NewsData> {
 
     public static void main(String[] args) throws Exception {
         while (true) {
-            BaiduNewsCrawler crawler = new BaiduNewsCrawler(CRAWLER_NAME, true);
+            NewsSearchBaidu crawler = new NewsSearchBaidu(CRAWLER_NAME, true);
+            if(crawler.RUN_MODE.equals("test")){
+                logger.warn("!!!!!!!!!!!!!!!!!!!!!!!!>>>test<<< mode!!!!!!!!!!!!!!!!!!!!!!!!");
+                logger.warn("!!!!!!!!!!!!!!!!!!!!!!!!>>>test<<< mode!!!!!!!!!!!!!!!!!!!!!!!!");
+                logger.warn("!!!!!!!!!!!!!!!!!!!!!!!!>>>test<<< mode!!!!!!!!!!!!!!!!!!!!!!!!");
+                logger.warn("!!!!!!!!!!!!!!!!!!!!!!!!>>>test<<< mode!!!!!!!!!!!!!!!!!!!!!!!!");
+                logger.warn("!!!!!!!!!!!!!!!!!!!!!!!!>>>test<<< mode!!!!!!!!!!!!!!!!!!!!!!!!");
+            }
             crawler.setThreads(1);
             crawler.setExecuteInterval(3 * 1000);
             crawler.start(5);
+
+
 
             Thread.sleep(1000 * 3600 * 2);
         }

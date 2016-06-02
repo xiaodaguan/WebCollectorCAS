@@ -3,9 +3,8 @@ package crawler;
 import cn.edu.hfut.dmic.webcollector.model.CrawlDatums;
 import cn.edu.hfut.dmic.webcollector.model.Page;
 import cn.edu.hfut.dmic.webcollector.plugin.berkeley.BreadthCrawler;
-import data.EbData;
+import crawler.smedia.EbSearchJd;
 import data.SearchKeyInfo;
-import db.JDBCHelper;
 import org.jsoup.select.Elements;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,7 +34,7 @@ public abstract class BaseCrawler<T> extends BreadthCrawler {
 
     /* </配置> */
 
-    private static Logger logger = LoggerFactory.getLogger(JdSearchCrawler.class);
+    private static Logger logger = LoggerFactory.getLogger(EbSearchJd.class);
 
     private static JdbcTemplate jdbcTemplate = null;
     private List<String> crawledItems = null; // crawled items
@@ -45,11 +44,10 @@ public abstract class BaseCrawler<T> extends BreadthCrawler {
 
     }
 
-    protected abstract void generateSeeds(List<SearchKeyInfo> searchKeyInfos) throws UnsupportedEncodingException;
+    protected abstract CrawlDatums generateSeeds(List<SearchKeyInfo> searchKeyInfos) throws UnsupportedEncodingException;
 
-    protected abstract List<SearchKeyInfo> loadSearchKeyInfos();
 
-    protected abstract void loadCrawledItems();
+    protected abstract List<String> loadCrawledItems();
 
 
     protected abstract T parseDetailPage(Page page);

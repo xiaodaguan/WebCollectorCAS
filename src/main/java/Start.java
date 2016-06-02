@@ -1,8 +1,6 @@
-import crawler.JdSearchCrawler;
+import crawler.smedia.EbSearchJd;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.UnsupportedEncodingException;
 
 /**
  * Created by guanxiaoda on 5/23/16.
@@ -21,7 +19,7 @@ public class Start {
             logger.info("start...");
 
 
-            JdSearchCrawler jdsCrawler = new JdSearchCrawler(path + "eb_jd_search", true);
+            EbSearchJd jdsCrawler = new EbSearchJd(path + "eb_jd_search", true);
             jdsCrawler.setThreads(1);
             jdsCrawler.setExecuteInterval(15 * 1000);
             jdsCrawler.start(3);
