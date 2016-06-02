@@ -2,7 +2,8 @@
 
 
 
-_crawlers based on webcollector_
+_crawlers based on webcollector_  
+若干个自己基于webcollector实现的爬虫，包括百度新闻搜索、微博搜索(使用selenium 模拟登录微博)、京东商品基本信息采集等  
 
 ## quick start
 -  编写一个爬虫
