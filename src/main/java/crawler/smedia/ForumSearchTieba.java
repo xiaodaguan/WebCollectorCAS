@@ -5,6 +5,15 @@ package crawler.smedia;
  * todo
  */
 public class ForumSearchTieba {
+    private String content;
 
+
+    public String getContent() {
+        return content;
+    }
+
+    public void setContent(String content) {
+        this.content = content;
+    }
 }
 

@@ -8,7 +8,7 @@
 out
 gen### Java template
 *.class
-
+models
 # Mobile Tools for Java (J2ME)
 .mtj.tmp/
 
@@ -24,3 +24,10 @@ target
 hs_err_pid*
 
 manifests/
+
+crawler.*/
+news_baidu_search
+eb_jd_search
+NgaCrawler
+wordcount.txt
+wordcount_filter.txt
