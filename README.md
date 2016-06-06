@@ -13,7 +13,7 @@ _crawlers based on webcollector_
     -  编写配置
     -  实现visit()方法
 
-> 详见main.java.JdSearchCrawler，一个爬取京东商品基本信息的简单爬虫,列表页+详情页模式采集  
+> 详见main.java.crawler.smedia.EbSearchJd.java，一个爬取京东商品基本信息的简单爬虫,列表页+详情页模式采集  
 
 
 ## 目录  
