@@ -24,7 +24,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.JdbcTemplate;
 import util.MD5;
-import util.re;
+import util.Re;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
@@ -114,8 +114,8 @@ public class WeiboSearchSina extends BaseCrawler<WeiboData> {
 
             }
         } else {
-            String uname = "demondsg1";
-            String passwd = "s327gxd";
+            String uname = "zoo_1@sina.com";
+            String passwd = "zoo_1@sina.com";
             String cookie = userLogin(uname, passwd);
             if (userCookies == null) userCookies = new HashMap<String, String>();//init map
             userCookies.put(uname, cookie);
@@ -230,7 +230,7 @@ public class WeiboSearchSina extends BaseCrawler<WeiboData> {
         String userName = null;
         Element userE = page.select("div.WB_feed_detail.clearfix > div.WB_detail > div.WB_info > a").first();
         if (userE != null) {
-            uid = re.rExtract(userE.attr("usercard"), "id=\\d+").replace("id=", "");
+            uid = Re.rExtract(userE.attr("usercard"), "id=\\d+").replace("id=", "");
             userUrl = userE.attr("href");
             userName = userE.text();
         }
@@ -253,10 +253,10 @@ public class WeiboSearchSina extends BaseCrawler<WeiboData> {
         String commCountStr = commE != null ? commE.text() : null;
         String likeCountStr = likeE != null ? likeE.text() : null;
 
-        int collCount = collCountStr != null ? re.rMatches(collCountStr, "\\d+") ? Integer.parseInt(collCountStr) : 0 : 0;
-        int rttCount = rttCountStr != null ? re.rMatches(rttCountStr, "\\d+") ? Integer.parseInt(rttCountStr) : 0 : 0;
-        int commCount = commCountStr != null ? re.rMatches(commCountStr, "\\d+") ? Integer.parseInt(commCountStr) : 0 : 0;
-        int likeCount = likeCountStr != null ? re.rMatches(likeCountStr, "\\d+") ? Integer.parseInt(likeCountStr) : 0 : 0;
+        int collCount = collCountStr != null ? Re.rMatches(collCountStr, "\\d+") ? Integer.parseInt(collCountStr) : 0 : 0;
+        int rttCount = rttCountStr != null ? Re.rMatches(rttCountStr, "\\d+") ? Integer.parseInt(rttCountStr) : 0 : 0;
+        int commCount = commCountStr != null ? Re.rMatches(commCountStr, "\\d+") ? Integer.parseInt(commCountStr) : 0 : 0;
+        int likeCount = likeCountStr != null ? Re.rMatches(likeCountStr, "\\d+") ? Integer.parseInt(likeCountStr) : 0 : 0;
         //用户头像
         Element userImgE = page.select("div.WB_face.W_fl > div.face > a > img").first();
         String userImg = userImgE != null ? userImgE.attr("src") : null;
@@ -307,8 +307,8 @@ public class WeiboSearchSina extends BaseCrawler<WeiboData> {
         String url = page.getUrl();
 
         String pattern = "&page=\\d+";
-        String currPageStr = re.rExtract(url, pattern);
-        String numStr = re.rExtract(currPageStr, "\\d+");
+        String currPageStr = Re.rExtract(url, pattern);
+        String numStr = Re.rExtract(currPageStr, "\\d+");
 
         assert numStr != null : "paging err.";
         int currPageNum = Integer.parseInt(numStr);
@@ -377,7 +377,7 @@ public class WeiboSearchSina extends BaseCrawler<WeiboData> {
     public void visit(Page page, CrawlDatums next) {
         //url, pubtime, insert_time, md5, user_id, comment_count, rtt_count, mid, comment_url, rtt_url, author, author_url, search_keyword, category_code, author_img, content, source, img_url, gps, like_count
         if (isListPage(page)) {
-            List<String> scripts = re.rExtractList(page.getHtml(), "<script>STK.*STK.*pageletM.*pageletM.*view.*<\\/script>");
+            List<String> scripts = Re.rExtractList(page.getHtml(), "<script>STK.*STK.*pageletM.*pageletM.*view.*<\\/script>");
             StringBuilder sb = new StringBuilder();
             for (String script : scripts) {
                 JSONObject jo = new JSONObject(script.substring(script.indexOf("{"), script.lastIndexOf("}") + 1));
@@ -399,7 +399,7 @@ public class WeiboSearchSina extends BaseCrawler<WeiboData> {
         } else if (isDetailPage(page)) {
             // parse item
 
-            List<String> scripts = re.rExtractList(page.getHtml(), "<script>FM\\.view.*<\\/script>");
+            List<String> scripts = Re.rExtractList(page.getHtml(), "<script>FM\\.view.*<\\/script>");
             StringBuilder sb = new StringBuilder();
             for (String script : scripts) {
                 JSONObject jo = new JSONObject(script.substring(script.indexOf("{"), script.lastIndexOf("}") + 1));

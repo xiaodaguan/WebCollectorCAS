@@ -15,6 +15,7 @@ import java.util.List;
 
 /**
  * Created by guanxiaoda on 5/24/16.
+ *
  */
 public abstract class BaseCrawler<T> extends BreadthCrawler {
 

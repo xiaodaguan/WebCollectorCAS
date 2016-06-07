@@ -32,12 +32,12 @@ public class DataPersistence {
      *
      * @param jdbcTemplate
      * @param accountTableName
-     * @param type
+     * @param siteId
      * @return
      */
-    public static HashMap<String, String> loadUserPass(JdbcTemplate jdbcTemplate, String accountTableName, int type) {
+    public static HashMap<String, String> loadUserPass(JdbcTemplate jdbcTemplate, String accountTableName, int siteId) {
         logger.info("loading crawler accounts...");
-        String SQL = "select name, pass from " + accountTableName + " where site_id = " + type + " and valid = 1";
+        String SQL = "select name, pass from " + accountTableName + " where site_id = " + siteId + " and valid = 1";
         SqlRowSet rs = jdbcTemplate.queryForRowSet(SQL);
         HashMap<String, String> result = new HashMap<String, String>();
         while (rs.next()) {

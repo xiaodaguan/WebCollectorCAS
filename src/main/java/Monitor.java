@@ -43,15 +43,15 @@ public class Monitor {
 
     private void show() {
         ArrayList<String> names = new ArrayList<String>();
-//        names.add("tire");
-//        names.add("jinrong");
+        names.add("tire");
+        names.add("jinrong");
         names.add("traffic");
-//        names.add("tech");
+        names.add("tech");
         for (String jdbcTemplateName : names) {
-            show24hInsertTime(jdbcTemplateName);
+//            show24hInsertTime(jdbcTemplateName);
             showTodayInsertTime(jdbcTemplateName);
-            show24hPubTime(jdbcTemplateName);
-            showTodayPubTime(jdbcTemplateName);
+//            show24hPubTime(jdbcTemplateName);
+//            showTodayPubTime(jdbcTemplateName);
         }
 
     }

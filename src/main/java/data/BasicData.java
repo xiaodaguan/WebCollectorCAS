@@ -4,6 +4,7 @@ import java.sql.Date;
 
 /**
  * Created by guanxiaoda on 5/24/16.
+ *
  */
 public class BasicData {
     private String title;
