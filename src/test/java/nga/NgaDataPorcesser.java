@@ -1,6 +1,5 @@
 package nga;
 
-import com.google.gson.Gson;
 import com.mongodb.*;
 import org.fnlp.nlp.cn.CNFactory;
 import org.fnlp.util.exception.LoadModelException;

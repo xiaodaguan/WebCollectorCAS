@@ -24,10 +24,11 @@ target
 hs_err_pid*
 
 manifests/
-
+tmphtml
 crawler.*/
 news_baidu_search
 eb_jd_search
 NgaCrawler
 wordcount.txt
 wordcount_filter.txt
+phantomjsdriver.log

@@ -17,8 +17,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.JdbcTemplate;
 import util.MD5;
-import util.re;
-import util.time;
+import util.Re;
+import util.Time;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
@@ -103,7 +103,7 @@ public class NewsSearchBaidu extends BaseCrawler<NewsData> {
 
     @Override
     protected void paging(Page page, CrawlDatums crawlDatums) {
-        String currPnStr = re.rExtract(page.getUrl(), "&pn=\\d+");
+        String currPnStr = Re.rExtract(page.getUrl(), "&pn=\\d+");
         String nextUrl;
         if (currPnStr != null) {
             int currPn = Integer.parseInt(currPnStr.replace("&pn=", ""));
@@ -144,7 +144,7 @@ public class NewsSearchBaidu extends BaseCrawler<NewsData> {
             String source = source_time.split("  ")[0];
             String timeStr = source_time.split("  ")[1];
             String sameUrl = null;
-            sameNumStr = re.rExtract(sameNumStr, "\\d+");
+            sameNumStr = Re.rExtract(sameNumStr, "\\d+");
             if (sameNumStr != null)//如果没有相同新闻数则不抽取相同新闻url
                 sameUrl = "http://news.baidu.com" + element.select("div>span>a:nth-child(1)").attr("href");
 
@@ -192,7 +192,7 @@ public class NewsSearchBaidu extends BaseCrawler<NewsData> {
             e.printStackTrace();
         }
 
-        java.util.Date pubdate = time.timeFormat(pubtimeRaw);
+        java.util.Date pubdate = Time.timeFormat(pubtimeRaw);
 
         NewsData nsData = new NewsData();
         nsData.setTitle(title);
