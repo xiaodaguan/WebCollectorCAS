@@ -3,6 +3,7 @@ package crawler.smedia;
 import cn.edu.hfut.dmic.webcollector.model.CrawlDatums;
 import cn.edu.hfut.dmic.webcollector.model.Page;
 import crawler.BaseCrawler;
+import crawler.downloader.SeleniumWebDriverManager;
 import data.ForumData;
 import db.DataPersistence;
 import db.JDBCHelper;
@@ -16,9 +17,7 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.JdbcTemplate;
-import util.File;
 
-import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 import java.util.List;
@@ -87,10 +86,8 @@ public class ForumSearchTieba extends BaseCrawler<ForumData> {
 
     private String userLogin(String uname, String passwd) {
         logger.info("user [{}] signing in...");
-        DesiredCapabilities caps = new DesiredCapabilities();
-        caps.setCapability(PhantomJSDriverService.PHANTOMJS_EXECUTABLE_PATH_PROPERTY, "phantomjs/osx/phantomjs");
 
-        PhantomJSDriver driver = new PhantomJSDriver(caps);
+        PhantomJSDriver driver = SeleniumWebDriverManager.getInstance().getPhantomJSDriver();
         driver.get("https://passport.baidu.com/v2/?login");
 
         WebDriverWait wait = new WebDriverWait(driver,20);
@@ -115,6 +112,7 @@ public class ForumSearchTieba extends BaseCrawler<ForumData> {
                 sb.append(cookie.getName()+"="+cookie.getValue()+";");
             }
             cookies =  sb.toString();
+            logger.info("user: [{}], cookie: [{}]", uname,cookies);
         }catch (TimeoutException te){
             logger.error("user [{}] login failed!", uname);
             cookies = null;
@@ -137,7 +135,7 @@ public class ForumSearchTieba extends BaseCrawler<ForumData> {
     }
 
     @Override
-    protected Object parseDetailPage(Page page) {
+    protected ForumData parseDetailPage(Page page) {
         return null;
     }
 
