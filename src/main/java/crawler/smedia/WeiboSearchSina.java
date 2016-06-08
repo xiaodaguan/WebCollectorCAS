@@ -6,6 +6,7 @@ import cn.edu.hfut.dmic.webcollector.model.Page;
 import cn.edu.hfut.dmic.webcollector.net.HttpRequest;
 import cn.edu.hfut.dmic.webcollector.net.HttpResponse;
 import crawler.BaseCrawler;
+import crawler.downloader.SeleniumWebDriverManager;
 import data.SearchKeyInfo;
 import data.WeiboData;
 import db.DataPersistence;
@@ -16,16 +17,22 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Cookie;
+import org.openqa.selenium.Dimension;
+import org.openqa.selenium.OutputType;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.firefox.FirefoxProfile;
+import org.openqa.selenium.htmlunit.HtmlUnitDriver;
+import org.openqa.selenium.phantomjs.PhantomJSDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.JdbcTemplate;
+import util.File;
 import util.MD5;
 import util.Re;
 
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.sql.Date;
@@ -55,8 +62,8 @@ public class WeiboSearchSina extends BaseCrawler<WeiboData> {
 
     private static String URL_TEMPLATE = "http://s.weibo.com/weibo/<KEYWORD>&page=1&nodup=1";
 
-//    final private static String RUN_MODE = "test";//test or run
-    final private static String RUN_MODE = "run";
+    final private static String RUN_MODE = "test";//test or run
+//    final private static String RUN_MODE = "run";
 
     /* </配置> */
 
@@ -125,18 +132,28 @@ public class WeiboSearchSina extends BaseCrawler<WeiboData> {
 
     private String userLogin(String uname, String passwd) {
         logger.info("user [{}] signing in...", uname);
-        FirefoxProfile profile = new FirefoxProfile();
-        profile.setAcceptUntrustedCertificates(true);
-        profile.setAssumeUntrustedCertificateIssuer(false);
-        FirefoxDriver driver = new FirefoxDriver(profile);
+//        FirefoxProfile profile = new FirefoxProfile();
+//        profile.setAcceptUntrustedCertificates(true);
+//        profile.setAssumeUntrustedCertificateIssuer(false);
+//        FirefoxDriver driver = new FirefoxDriver();
+        PhantomJSDriver driver = SeleniumWebDriverManager.getInstance().getPhantomJSDriver();
 
         driver.get("http://weibo.com/login.php");
-        WebDriverWait driverWait = new WebDriverWait(driver, 20);
-        driverWait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector("#pl_login_form > div > div.info_header > div > a:nth-child(2)")));
+        WebDriverWait driverWait = new WebDriverWait(driver, 10);
+
+        driverWait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector("a[suda-uatrack*=ordinary_login]")));
+        try {
+            File.writeTxt("tmphtml/tmp.html", driver.getPageSource());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        driver.findElementByCssSelector("a[suda-uatrack*=ordinary_login]").click();
+
         driver.findElementByCssSelector("#pl_login_form > div > div.info_header > div > a:nth-child(2)").click();
         driver.findElementByCssSelector("#loginname").clear();
         driver.findElementByCssSelector("#loginname").sendKeys(uname);
         driver.findElementByCssSelector("div.info_list.password > div > input").sendKeys(passwd);
+
 
         driver.findElementByCssSelector("#pl_login_form > div > div:nth-child(3) > div.info_list.login_btn > a").click();
         driverWait = new WebDriverWait(driver, 20);
