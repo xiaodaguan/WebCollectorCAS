@@ -3,7 +3,7 @@ package crawler.smedia;
 import cn.edu.hfut.dmic.webcollector.model.CrawlDatums;
 import cn.edu.hfut.dmic.webcollector.model.Page;
 import crawler.BaseCrawler;
-import crawler.downloader.SeleniumWebDriverManager;
+import downloader.SeleniumWebDriverManager;
 import data.WeixinData;
 import org.jsoup.select.Elements;
 import org.openqa.selenium.phantomjs.PhantomJSDriver;
@@ -12,12 +12,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 import java.io.UnsupportedEncodingException;
-import java.util.HashMap;
 import java.util.List;
 
 /**
  * Created by guanxiaoda on 6/7/16.
- *
+ * todo
  */
 public class WeixinSearchSogou extends BaseCrawler<WeixinData> {
     /* <配置> */
