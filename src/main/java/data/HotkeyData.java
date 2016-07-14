@@ -9,11 +9,20 @@ import java.sql.Date;
 public class HotkeyData {
 
     private String keyword;
+    private int cate;
     private String url;
     private String topUrl;
     private int searchIndex;
     private int trend;
     private Date crawlDate;
+
+    public int getCate() {
+        return cate;
+    }
+
+    public void setCate(int cate) {
+        this.cate = cate;
+    }
 
     public String getKeyword() {
         return keyword;
