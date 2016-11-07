@@ -28,10 +28,22 @@ import java.util.Map;
  * Created by guanxiaoda on 7/8/16.
  */
 public class BaiduHotKeyCrawler extends BreadthCrawler {
+
+
+    public static void main(String[] args) throws Exception {
+        BaiduHotKeyCrawler hotKeyCrawler = new BaiduHotKeyCrawler("BaiduHotKey", false);
+        hotKeyCrawler.setThreads(1);
+        hotKeyCrawler.setExecuteInterval(1);
+        hotKeyCrawler.start(10);
+
+
+    }
+
+
     private static Logger logger = LoggerFactory.getLogger(BaiduHotKeyCrawler.class);
-    private final static String ORACLEURL = "jdbc:oracle:thin:@172.18.79.3:1521/orcl";
+    private final static String ORACLEURL = "jdbc:oracle:thin:@172.18.79.32:1521/orcl";
     private final static String ORACLEUSER = "TOPSEARCH";
-    private final static String ORACLEPASS = "TOPSEARCH";
+    private final static String ORACLEPASS = "topsearch";
 
     private final static JdbcTemplate JDBC_TEMPLATE = db.JDBCHelper.createOracleTemplate(BaiduHotKeyCrawler.class.getName(), ORACLEURL, ORACLEUSER, ORACLEPASS, 5, 30);
     private final static String DATA_TABLE = "search_keyword";
@@ -44,8 +56,11 @@ public class BaiduHotKeyCrawler extends BreadthCrawler {
         super(crawlPath, autoParse);
         this.addSeed("http://top.baidu.com/category?c=513");
 
-        crawledItems = JDBC_TEMPLATE.queryForList("select distinct(keyword) from " + DATA_TABLE, String.class);
+        crawledItems = new ArrayList<String>();
+
+        crawledItems = JDBC_TEMPLATE.queryForList("select keyword||trunc(propose_time) from " + DATA_TABLE, String.class);
         logger.info("{} crawled items.", crawledItems.size());
+
 
         List rows = JDBC_TEMPLATE.queryForList("select id,name from " + CATE_TABLE);
         int count = 0;
@@ -74,7 +89,12 @@ public class BaiduHotKeyCrawler extends BreadthCrawler {
         } else if (page.getUrl().contains("/buzz")) {
             Element cateE = page.select("#main > div.mainBody > div > div > h2").first();
             String cateStr = cateE.text();
+
+
+            if(!cateStr.contains("七日")&&!cateStr.contains("今日"))
+                return;
             int categoryCode = cateCode.containsKey(cateStr) ? cateCode.get(cateStr) : 0;
+
 
             Elements keywordList = page.select("td.keyword > a.list-title");
 
@@ -89,6 +109,7 @@ public class BaiduHotKeyCrawler extends BreadthCrawler {
                 data.setUrl(url);
                 data.setTopUrl(detailUrl);
                 data.setCate(categoryCode);
+                data.setSiteId(1);
                 results.add(data);
             }
 
@@ -123,7 +144,7 @@ public class BaiduHotKeyCrawler extends BreadthCrawler {
                     continue;
                 }
                 count++;
-                JDBC_TEMPLATE.update("insert into " + DATA_TABLE + "(keyword, search_index, propose_time, category_code, status, type) values(?,?,?,?,?,?)", new PreparedStatementSetter() {
+                JDBC_TEMPLATE.update("insert into " + DATA_TABLE + "(keyword, search_index, propose_time, category_code, status, type, site_id) values(?,?,?,?,?,?,?)", new PreparedStatementSetter() {
                     public void setValues(PreparedStatement ps) throws SQLException {
                         ps.setString(1, data.getKeyword());
                         ps.setInt(2, data.getSearchIndex());
@@ -131,6 +152,7 @@ public class BaiduHotKeyCrawler extends BreadthCrawler {
                         ps.setInt(4, data.getCate());
                         ps.setInt(5, 2);
                         ps.setString(6, ";1;2;4;8;");
+                        ps.setInt(7,data.getSiteId());
                     }
                 });
             }
@@ -141,10 +163,4 @@ public class BaiduHotKeyCrawler extends BreadthCrawler {
     }
 
 
-    public static void main(String[] args) throws Exception {
-        BaiduHotKeyCrawler hotKeyCrawler = new BaiduHotKeyCrawler("BaiduHotKey", false);
-        hotKeyCrawler.setThreads(1);
-        hotKeyCrawler.setExecuteInterval(1);
-        hotKeyCrawler.start(10);
-    }
 }

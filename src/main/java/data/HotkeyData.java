@@ -15,6 +15,15 @@ public class HotkeyData {
     private int searchIndex;
     private int trend;
     private Date crawlDate;
+    private int siteId;
+
+    public int getSiteId() {
+        return siteId;
+    }
+
+    public void setSiteId(int siteId) {
+        this.siteId = siteId;
+    }
 
     public int getCate() {
         return cate;

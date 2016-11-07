@@ -34,20 +34,20 @@ public class NewsSearchBaidu extends BaseCrawler<NewsData> {
     static {
         CLogFactory.configure("../../config/crawlerlog.properties");
     }
-    final static CLog cLogger = CLogFactory.getLogger("http://172.18.79.2:8080/crawlerlogserver","cjr000001","192.168.31.123");
+    final static CLog cLogger = CLogFactory.getLogger("http://172.18.79.2:8080/crawlerlogserver","cjr000001","192.168.31.123","news");
 
 
     final private static String CRAWLER_NAME = NewsSearchBaidu.class.getName()+"_jinrong";
     final private static String DB_URL = "172.18.79.3:1521/orcl";
-    final private static String DB_USER = "jinrong";
-    final private static String DB_PASSWORD = "jinrong";
+    final private static String DB_USER = "TOPSEARCH";
+    final private static String DB_PASSWORD = "TOPSEARCH";
     private static String DB_TABLE = "news_data";
     private static String DB_SEARCHKEYWORD_TABLE = "search_keyword";
 
     final private static String URL_TEMPLATE = "http://news.baidu.com/ns?word=<KEYWORD>&pn=0&cl=2&ct=0&tn=news&rn=20&ie=utf-8&bt=0&et=0&rsv_page=1";
 
-    final private static String RUN_MODE = "test";//test or run
-//    final private static String RUN_MODE = "run";
+//    final private static String RUN_MODE = "test";//test or run
+    final private static String RUN_MODE = "run";
 
     /* </配置> */
 
@@ -61,7 +61,7 @@ public class NewsSearchBaidu extends BaseCrawler<NewsData> {
     public NewsSearchBaidu(String crawlPath, boolean autoParse) throws UnsupportedEncodingException {
         super(crawlPath, autoParse);
 
-        cLogger.start("","news_search_baidu_jinrong");
+//        cLogger.start("","news_search_baidu_jinrong");
         jdbcTemplate = JDBCHelper.createOracleTemplate(CRAWLER_NAME, "jdbc:oracle:thin:@" + DB_URL, DB_USER, DB_PASSWORD, 5, 30);
         crawledItems = loadCrawledItems();
         List<SearchKeyInfo> searchKeyInfos = DataPersistence.loadSearchKeyInfos(jdbcTemplate, DB_SEARCHKEYWORD_TABLE,1);

@@ -1,0 +1,21 @@
+Manifest-Version: 1.0
+Class-Path: jsoup-1.8.3.jar trove4j-3.0.3.jar spring-tx-4.2.6.RELEASE.
+ jar hamcrest-core-1.3.jar commons-codec-1.9.jar commons-cli-1.2.jar g
+ uava-19.0.jar selenium-support-2.53.0.jar httpcore-4.4.4.jar commons-
+ dbcp-20030825.184428.jar crwlerlog.jar mongo-java-driver-3.2.2.jar sp
+ ring-beans-4.2.6.RELEASE.jar gson-2.3.1.jar slf4j-api-1.7.9.jar selen
+ ium-api-2.53.0.jar netty-3.5.7.Final.jar oracle-driver-ojdbc6-12.1.0.
+ 1.jar xsoup-0.3.1.jar selenium-ie-driver-2.53.0.jar selenium-safari-d
+ river-2.53.0.jar WebCollector-2.31.jar spring-core-4.2.6.RELEASE.jar 
+ httpclient-4.5.2.jar cglib-nodep-2.1_3.jar json-20140107.jar commons-
+ exec-1.3.jar juniversalchardet-1.0.3.jar assertj-core-1.5.0.jar phant
+ omjsdriver-1.2.0.jar jna-platform-4.1.0.jar org-apache-commons-pool-1
+ .4-201002241055.jar mysql-connector-java-6.0.2.jar selenium-leg-rc-2.
+ 53.0.jar commons-pool-1.4.jar selenium-java-2.53.0.jar httpcore-nio-4
+ .4.4.jar spring-jdbc-4.2.6.RELEASE.jar jna-4.1.0.jar commons-io-2.4.j
+ ar selenium-firefox-driver-2.53.0.jar jansi-1.12.jar commons-logging-
+ 1.2.jar je-5.0.73.jar junit-4.11.jar selenium-edge-driver-2.53.0.jar 
+ selenium-chrome-driver-2.53.0.jar log4j-1.2.17.jar slf4j-log4j12-1.7.
+ 9.jar selenium-remote-driver-2.53.0.jar fnlp-core-2.1-SNAPSHOT.jar
+Main-Class: crawler.smedia.hotKeywords.BaiduHotKeyCrawler
+
