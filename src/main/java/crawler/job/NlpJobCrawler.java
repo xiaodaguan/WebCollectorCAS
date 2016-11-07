@@ -1,4 +1,4 @@
-package crawler.other;
+package crawler.job;
 
 import cn.edu.hfut.dmic.webcollector.model.CrawlDatums;
 import cn.edu.hfut.dmic.webcollector.model.Page;
