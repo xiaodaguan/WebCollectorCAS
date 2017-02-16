@@ -159,7 +159,7 @@ public class BaiduHotKeyCrawler extends BreadthCrawler {
                         ps.setTimestamp(3, new Timestamp(data.getCrawlDate().getTime()));
                         ps.setInt(4, data.getCate());
                         ps.setInt(5, 2);
-                        ps.setString(6, ";1;2;4;8;");
+                        ps.setString(6, ";1;2;3;4;5;6;7;8;9;10;11;12;13;14;15;16;17;18;19;20;21;22;23;24;25;26;");
                         ps.setInt(7,data.getSiteId());
                     }
                 });
