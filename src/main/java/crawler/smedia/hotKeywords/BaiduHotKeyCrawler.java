@@ -18,6 +18,7 @@ import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -31,12 +32,17 @@ public class BaiduHotKeyCrawler extends BreadthCrawler {
 
 
     public static void main(String[] args) throws Exception {
-        BaiduHotKeyCrawler hotKeyCrawler = new BaiduHotKeyCrawler("BaiduHotKey", false);
-        hotKeyCrawler.setThreads(1);
-        hotKeyCrawler.setExecuteInterval(1);
-        hotKeyCrawler.start(10);
 
+        while(true) {
+            BaiduHotKeyCrawler hotKeyCrawler = new BaiduHotKeyCrawler("BaiduHotKey", false);
+            hotKeyCrawler.setThreads(1);
+            hotKeyCrawler.setExecuteInterval(1);
+            hotKeyCrawler.start(10);
 
+            int wait=15*60;
+            logger.info("wait {} seconds before starting next scan...",wait);
+            Thread.sleep(1000*wait);
+        }
     }
 
 
@@ -58,7 +64,7 @@ public class BaiduHotKeyCrawler extends BreadthCrawler {
 
         crawledItems = new ArrayList<String>();
 
-        crawledItems = JDBC_TEMPLATE.queryForList("select keyword||trunc(propose_time) from " + DATA_TABLE, String.class);
+        crawledItems = JDBC_TEMPLATE.queryForList("select keyword||to_char(propose_time,'YYYYMMDD') from " + DATA_TABLE, String.class);
         logger.info("{} crawled items.", crawledItems.size());
 
 
@@ -138,23 +144,29 @@ public class BaiduHotKeyCrawler extends BreadthCrawler {
              * items
              */
             int count = 0;
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
             for (final HotkeyData data : results) {
-                if (crawledItems.contains(data.getKeyword())) {
-                    logger.error("drop old item {}", data.getKeyword());
+                String fingerPrint = data.getKeyword()+sdf.format(data.getCrawlDate());
+                if (crawledItems.contains(data.getKeyword()+sdf.format(data.getCrawlDate()))) {
+                    logger.error("drop crawled item {}", data.getKeyword()+sdf.format(data.getCrawlDate()));
                     continue;
                 }
                 count++;
-                JDBC_TEMPLATE.update("insert into " + DATA_TABLE + "(keyword, search_index, propose_time, category_code, status, type, site_id) values(?,?,?,?,?,?,?)", new PreparedStatementSetter() {
+                int rowsUpdated = JDBC_TEMPLATE.update("insert into " + DATA_TABLE + "(keyword, search_index, propose_time, category_code, status, type, site_id) values(?,?,?,?,?,?,?)", new PreparedStatementSetter() {
                     public void setValues(PreparedStatement ps) throws SQLException {
                         ps.setString(1, data.getKeyword());
                         ps.setInt(2, data.getSearchIndex());
                         ps.setTimestamp(3, new Timestamp(data.getCrawlDate().getTime()));
                         ps.setInt(4, data.getCate());
                         ps.setInt(5, 2);
-                        ps.setString(6, ";1;2;4;8;");
+                        ps.setString(6, ";1;2;3;4;5;6;7;8;9;10;11;12;13;14;15;16;17;18;19;20;21;22;23;24;25;26;");
                         ps.setInt(7,data.getSiteId());
                     }
                 });
+
+                if(rowsUpdated > 0 ){
+                    logger.info("item saved{}", data.getKeyword()+sdf.format(data.getCrawlDate()));
+                }
             }
 
             logger.info("page items inserted to {}/{}:[{}]", ORACLEURL, DATA_TABLE, count);
