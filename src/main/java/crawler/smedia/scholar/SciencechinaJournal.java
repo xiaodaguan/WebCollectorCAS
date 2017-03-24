@@ -304,7 +304,7 @@ public class SciencechinaJournal extends BaseCrawler<ScholarData> {
              *       page=&searchmode=&dbtype=&searchword=%28JOURNAL_NAME_GF_EX%3A%22%E8%87%AA%E5%8A%A8%E5%8C%96%E5%AD%A6%E6%8A%A5%22%29+AND+CITE%3A1+&sortfld=&order=&group_num=&detailType=2&loc=2
              */
 
-            String url = "http://sciencechina.cn/detail.jsp?i=" + i;
+            String url = "http://sciencechina.cn/detail.jsp?i=" + i + "#key="+ski;
             CrawlDatum crawlDatum = new CrawlDatum(url);
             crawlDatum.meta("method", "POST");
             crawlDatum.meta("cookie", listCookie);
