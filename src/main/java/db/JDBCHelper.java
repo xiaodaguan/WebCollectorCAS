@@ -41,6 +41,20 @@ public class JDBCHelper {
         return template;
     }
 
+    public static JdbcTemplate createMysqlTemplate(String templateName, String url, String uname, String pwd, int initialSize, int maxActive){
+        BasicDataSource dataSource = new BasicDataSource();
+        dataSource.setDriverClassName("com.mysql.jdbc.Driver");
+        dataSource.setUrl(url);
+        dataSource.setUsername(uname);
+        dataSource.setPassword(pwd);
+        dataSource.setMaxActive(maxActive);
+
+        JdbcTemplate template = new JdbcTemplate(dataSource);
+        templateMap.put(templateName,template);
+
+        return template;
+    }
+
 
     public static JdbcTemplate getJdbcTemplate(String templateName) {
         return templateMap.get(templateName);
