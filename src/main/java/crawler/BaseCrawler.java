@@ -51,15 +51,23 @@ public abstract class BaseCrawler<T> extends BreadthCrawler {
     protected abstract List<String> loadCrawledItems();
 
 
-    protected abstract T parseDetailPage(Page page);
+    protected T parseDetailPage(Page page) {
+        return null;
+    }
 
     protected abstract void paging(Page page, CrawlDatums crawlDatums);
 
-    protected abstract Elements parseList(Page page, CrawlDatums crawlDatums);
+    protected Elements parseList(Page page, CrawlDatums crawlDatums) {
+        return null;
+    }
 
-    protected abstract boolean isDetailPage(Page page);
+    protected boolean isDetailPage(Page page) {
+        return false;
+    }
 
-    protected abstract boolean isListPage(Page page);
+    protected boolean isListPage(Page page) {
+        return false;
+    }
 
     protected abstract void saveData(T t);
 

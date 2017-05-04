@@ -65,32 +65,32 @@ public class SciencechinaJournal extends BaseCrawler<ScholarData> {
         crawledItems = loadCrawledItems();
 
         searchKeys.add("控制理论与应用#2013#2016");
-        searchKeys.add("控制工程#2013#2016");
-        searchKeys.add("信息与控制#2013#2016");
-        searchKeys.add("中国科学F辑#2013#2016");
-        searchKeys.add("模式识别与人工智能#2013#2016");
-
-        searchKeys.add("自动化学报#2013#2016");
-        searchKeys.add("计算机学报#2013#2016");
-        searchKeys.add("仪器仪表学报#2013#2016");
-        searchKeys.add("传感技术学报#2013#2016");
-        searchKeys.add("计算机集成制造系统#2013#2016");
-
-        searchKeys.add("计算机测量与控制#2013#2016");
-        searchKeys.add("测控技术#2013#2016");
-        searchKeys.add("传感器与微系统#2013#2016");
-        searchKeys.add("系统工程理论与实践#2013#2016");
-        searchKeys.add("控制与决策#2013#2016");
-
-        searchKeys.add("系统工程学报#2013#2016");
-        searchKeys.add("中国惯性技术学报#2013#2016");
-        searchKeys.add("宇航学报#2013#2016");
-        searchKeys.add("航空学报#2013#2016");
-        searchKeys.add("中国空间科学与技术#2013#2016");
-
-        searchKeys.add("航天控制#2013#2016");
-        searchKeys.add("空间控制技术与应用#2013#2016");
-        searchKeys.add("导航与控制#2013#2016");
+//        searchKeys.add("控制工程#2013#2016");
+//        searchKeys.add("信息与控制#2013#2016");
+//        searchKeys.add("中国科学F辑#2013#2016");
+//        searchKeys.add("模式识别与人工智能#2013#2016");
+//
+//        searchKeys.add("自动化学报#2013#2016");
+//        searchKeys.add("计算机学报#2013#2016");
+//        searchKeys.add("仪器仪表学报#2013#2016");
+//        searchKeys.add("传感技术学报#2013#2016");
+//        searchKeys.add("计算机集成制造系统#2013#2016");
+//
+//        searchKeys.add("计算机测量与控制#2013#2016");
+//        searchKeys.add("测控技术#2013#2016");
+//        searchKeys.add("传感器与微系统#2013#2016");
+//        searchKeys.add("系统工程理论与实践#2013#2016");
+//        searchKeys.add("控制与决策#2013#2016");
+//
+//        searchKeys.add("系统工程学报#2013#2016");
+//        searchKeys.add("中国惯性技术学报#2013#2016");
+//        searchKeys.add("宇航学报#2013#2016");
+//        searchKeys.add("航空学报#2013#2016");
+//        searchKeys.add("中国空间科学与技术#2013#2016");
+//
+//        searchKeys.add("航天控制#2013#2016");
+//        searchKeys.add("空间控制技术与应用#2013#2016");
+//        searchKeys.add("导航与控制#2013#2016");
 
         CrawlDatums seeds = generateSeeds(searchKeys);
         this.addSeed(seeds);
