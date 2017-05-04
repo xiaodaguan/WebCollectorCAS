@@ -11,6 +11,12 @@ public class SearchKeyInfo {
     private String site_id;
     private String site_name;
 
+    /* scholar paper */
+
+    private String startDate;//search time period <from>
+    private String endDate;//search time period <to>
+
+
     @Override
     public String toString(){
         return keyword;

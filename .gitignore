@@ -13,7 +13,7 @@ models
 .mtj.tmp/
 
 # Package Files #
-*.jar
+
 *.war
 *.ear
 
@@ -32,3 +32,6 @@ NgaCrawler
 wordcount.txt
 wordcount_filter.txt
 phantomjsdriver.log
+BaiduHotKey
+WowheadCN
+sogouweixin

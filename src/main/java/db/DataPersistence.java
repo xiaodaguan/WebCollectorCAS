@@ -1,9 +1,6 @@
 package db;
 
-import data.EbData;
-import data.NewsData;
-import data.SearchKeyInfo;
-import data.WeiboData;
+import data.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -95,19 +92,65 @@ public class DataPersistence {
         }
     }
 
+    public static boolean insertData(JdbcTemplate jdbctemplate, final ScholarData data, final String tableName) {
+        String INSERT_SQL = "insert into "+ tableName +
+                "(title, searchkey, category, insert_time, url, " +
+                "author, pubtime, summary, keywords, address, " +
+                "down_url, berefer_url, berefer_num, down_num, en_author, " +
+                "fund, journal, refer_url, md5, db, " +
+                "doi, language, issn, subject) values(" +
+                "?,?,?,?,?," +
+                "?,?,?,?,?," +
+                "?,?,?,?,?," +
+                "?,?,?,?,?," +
+                "?,?,?,?)";
+        try {
+            jdbctemplate.update(INSERT_SQL, new PreparedStatementSetter() {
+                public void setValues(PreparedStatement ps) throws SQLException {
+                    ps.setString(1, data.getTitle());
+                    ps.setString(2, data.getSearchKeyword());
+                    ps.setInt(3,0);
+                    ps.setTimestamp(4, new Timestamp(System.currentTimeMillis()));
+                    ps.setString(5, data.getUrl());
+
+                    ps.setString(6, data.getAuthor());
+                    ps.setString( 7, data.getPubtime());
+                    ps.setString(8,data.getSummary());
+                    ps.setString(9,data.getKeywords());
+                    ps.setString(10, data.getAddress());
+
+                    ps.setString(11, data.getDown_url());
+                    ps.setString(12, data.getBerefer_url());
+                    ps.setInt(13,data.getBerefer_num());
+                    ps.setInt(14, 0);
+                    ps.setString(15, data.getEn_author());
+
+                    ps.setString(16, data.getFund());
+                    ps.setString(17, data.getJournal());
+                    ps.setString(18, data.getBerefer_url());
+                    ps.setString(19, data.getMd5());
+                    ps.setString(20, data.getDatabase());
+
+                    ps.setString(21, data.getDoi());
+                    ps.setString(22, data.getLanguage());
+                    ps.setString(23, data.getIssn());
+                    ps.setString(24, data.getSubject());
+
+
+                }
+            });
+
+            return true;
+        } catch (Exception e) {
+
+            e.printStackTrace();
+            return false;
+        }
+    }
+
 
     public static boolean insertData(JdbcTemplate jdbctemplate, final EbData data, final String tableName) {
-        String INSERT_SQL = "INSERT INTO " + tableName + "(" +
-                "BRAND, TITLE, CONTENT, PRODUCT_IMG, INFO_IMG, " +
-                "INSERT_TIME, DIAMETER, WIDTH, PRICE, SALE_NUM, " +
-                "NAME, URL, SOURE, INFO, PUBTIME, " +
-                "CATEGORY_CODE, SEARCH_KEYWORD, SITE_ID, YEAR_MONTH, OWNER, " +
-                "MODEL, CODE_NUM, BRAND_FULL, COMPANY, MD5) VALUES(" +
-                "?,?,?,?,?," +
-                "?,?,?,?,?," +
-                "?,?,?,?,?," +
-                "?,?,?,?,?," +
-                "?,?,?,?,?)";
+        String INSERT_SQL = "INSERT INTO " + tableName + "(" + "BRAND, TITLE, CONTENT, PRODUCT_IMG, INFO_IMG, " + "INSERT_TIME, DIAMETER, WIDTH, PRICE, SALE_NUM, " + "NAME, URL, SOURE, INFO, PUBTIME, " + "CATEGORY_CODE, SEARCH_KEYWORD, SITE_ID, YEAR_MONTH, OWNER, " + "MODEL, CODE_NUM, BRAND_FULL, COMPANY, MD5) VALUES(" + "?,?,?,?,?," + "?,?,?,?,?," + "?,?,?,?,?," + "?,?,?,?,?," + "?,?,?,?,?)";
         try {
             jdbctemplate.update(INSERT_SQL, new PreparedStatementSetter() {
                 public void setValues(PreparedStatement ps) throws SQLException {
@@ -154,13 +197,7 @@ public class DataPersistence {
     }
 
     public static boolean insertData(JdbcTemplate jdbcTemplate, final NewsData data, final String tableName) {
-        String INSERT_SQL = "INSERT INTO " + tableName + "(" +
-                "BRIEF, CATEGORY_CODE, CONTENT, IMG_URL, INSERTTIME, " +
-                "MD5, PUBTIME, SAME_NUM, SAME_URL, SEARCH_KEYWORD, " +
-                "SOURCE, TITLE, URL) VALUES(" +
-                "?,?,?,?,?," +
-                "?,?,?,?,?," +
-                "?,?,?)";
+        String INSERT_SQL = "INSERT INTO " + tableName + "(" + "BRIEF, CATEGORY_CODE, CONTENT, IMG_URL, INSERTTIME, " + "MD5, PUBTIME, SAME_NUM, SAME_URL, SEARCH_KEYWORD, " + "SOURCE, TITLE, URL) VALUES(" + "?,?,?,?,?," + "?,?,?,?,?," + "?,?,?)";
         try {
             jdbcTemplate.update(INSERT_SQL, new PreparedStatementSetter() {
                 public void setValues(PreparedStatement ps) throws SQLException {
@@ -189,22 +226,7 @@ public class DataPersistence {
     }
 
     public static boolean insertData(JdbcTemplate jdbcTemplate, final WeiboData data, String dbTable) {
-        String INSERT_SQL = "INSERT INTO " + dbTable +
-                "(" +
-                "URL, PUBTIME, INSERT_TIME, MD5, USER_ID, " +
-                "COMMENT_COUNT, RTT_COUNT, MID, COMMENT_URL, RTT_URL, " +
-                "AUTHOR, AUTHOR_URL, SEARCH_KEYWORD, CATEGORY_CODE, AUTHOR_IMG, " +
-                "CONTENT, SOURCE, SITE_ID, IMG_URL, GPS, " +
-                "LIKE_COUNT" +
-                ") " +
-                "VALUES" +
-                "(" +
-                "?,?,?,?,?," +
-                "?,?,?,?,?," +
-                "?,?,?,?,?," +
-                "?,?,?,?,?," +
-                "?" +
-                ")";
+        String INSERT_SQL = "INSERT INTO " + dbTable + "(" + "URL, PUBTIME, INSERT_TIME, MD5, USER_ID, " + "COMMENT_COUNT, RTT_COUNT, MID, COMMENT_URL, RTT_URL, " + "AUTHOR, AUTHOR_URL, SEARCH_KEYWORD, CATEGORY_CODE, AUTHOR_IMG, " + "CONTENT, SOURCE, SITE_ID, IMG_URL, GPS, " + "LIKE_COUNT" + ") " + "VALUES" + "(" + "?,?,?,?,?," + "?,?,?,?,?," + "?,?,?,?,?," + "?,?,?,?,?," + "?" + ")";
         try {
             jdbcTemplate.update(INSERT_SQL, new PreparedStatementSetter() {
                 public void setValues(PreparedStatement ps) throws SQLException {
