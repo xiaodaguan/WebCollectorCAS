@@ -9,7 +9,12 @@ import java.net.*;
 public class ProxyUtil {
 
 
-
+    /**
+     *
+     * @param ip
+     * @param port
+     * @return true: proxy alive; false: proxy dead.
+     */
     public static boolean verify(String ip, int port){
 
         SocketAddress socketAddress = new InetSocketAddress(ip,port);
@@ -18,7 +23,7 @@ public class ProxyUtil {
         try{
             URL url = new URL("https://www.baidu.com");
             URLConnection conn = url.openConnection(proxy);
-            conn.setConnectTimeout(6000);
+            conn.setConnectTimeout(10000);
             conn.setRequestProperty("User-Agent","Mozilla/4.0 (compatible; MSIE 7.0; NT 5.1; GTB5; .NET CLR 2.0.50727; CIBA)");
             conn.getContent();
             return true;
@@ -28,7 +33,7 @@ public class ProxyUtil {
         try{
             URL url = new URL("https://www.sogou.com/");
             URLConnection conn = url.openConnection(proxy);
-            conn.setConnectTimeout(6000);
+            conn.setConnectTimeout(10000);
             conn.setRequestProperty("User-Agent","Mozilla/4.0 (compatible; MSIE 7.0; NT 5.1; GTB5; .NET CLR 2.0.50727; CIBA)");
             conn.getContent();
             return true;
@@ -38,7 +43,7 @@ public class ProxyUtil {
         try{
             URL url = new URL("https://www.taobao.com/");
             URLConnection conn = url.openConnection(proxy);
-            conn.setConnectTimeout(6000);
+            conn.setConnectTimeout(10000);
             conn.setRequestProperty("User-Agent","Mozilla/4.0 (compatible; MSIE 7.0; NT 5.1; GTB5; .NET CLR 2.0.50727; CIBA)");
             conn.getContent();
             return true;
@@ -48,7 +53,7 @@ public class ProxyUtil {
         try{
             URL url = new URL("http://www.qq.com/");
             URLConnection conn = url.openConnection(proxy);
-            conn.setConnectTimeout(6000);
+            conn.setConnectTimeout(10000);
             conn.setRequestProperty("User-Agent","Mozilla/4.0 (compatible; MSIE 7.0; NT 5.1; GTB5; .NET CLR 2.0.50727; CIBA)");
             conn.getContent();
             return true;
