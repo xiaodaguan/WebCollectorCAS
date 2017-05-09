@@ -54,20 +54,29 @@ public class IPProxyCrawler extends BreadthCrawler {
         /**
          * 代理网站添加在这里
          */
-        seeds.add("http://www.kuaidaili.com/free/inha/");
-        seeds.add("http://www.kuaidaili.com/free/inha/2");
-        seeds.add("http://www.kuaidaili.com/free/inha/3");
-        seeds.add("http://www.kuaidaili.com/free/inha/4");
-        seeds.add("http://www.kuaidaili.com/free/inha/5");
-        seeds.add("http://www.kuaidaili.com/free/inha/6");
-        seeds.add("http://www.kuaidaili.com/free/inha/7");
-        seeds.add("http://www.kuaidaili.com/free/outha/");
-        seeds.add("http://www.kuaidaili.com/free/outha/2");
-        seeds.add("http://www.kuaidaili.com/free/outha/3");
-        seeds.add("http://www.kuaidaili.com/free/outha/4");
-        seeds.add("http://www.kuaidaili.com/free/outha/5");
-        seeds.add("http://www.kuaidaili.com/free/outha/6");
-        seeds.add("http://www.kuaidaili.com/free/outha/7");
+//        {
+//        seeds.add("http://www.kuaidaili.com/free/inha/");
+//        seeds.add("http://www.kuaidaili.com/free/inha/2");
+//        seeds.add("http://www.kuaidaili.com/free/inha/3");
+//        seeds.add("http://www.kuaidaili.com/free/inha/4");
+//        seeds.add("http://www.kuaidaili.com/free/inha/5");
+//        seeds.add("http://www.kuaidaili.com/free/inha/6");
+//        seeds.add("http://www.kuaidaili.com/free/inha/7");
+//        seeds.add("http://www.kuaidaili.com/free/outha/");
+//        seeds.add("http://www.kuaidaili.com/free/outha/2");
+//        seeds.add("http://www.kuaidaili.com/free/outha/3");
+//        seeds.add("http://www.kuaidaili.com/free/outha/4");
+//        seeds.add("http://www.kuaidaili.com/free/outha/5");
+//        seeds.add("http://www.kuaidaili.com/free/outha/6");
+//        seeds.add("http://www.kuaidaili.com/free/outha/7");
+//        seeds.add("http://api.xicidaili.com/free2016.txt");
+//        }
+
+        /**
+         * dev
+         */
+        seeds.add("http://www.xicidaili.com/nn/");
+
         this.addSeed(seeds);
         return seeds;
     }
@@ -128,6 +137,34 @@ public class IPProxyCrawler extends BreadthCrawler {
             }
             logger.debug("kuaidaili");
 
+        }if(page.getUrl().contains("api.xicidaili")){
+            String cont = page.getHtml();
+            for(String line: cont.split("\r\n")){
+                String ip = line.split(":")[0];
+                String port = line.split(":")[1];
+                String type = "unknown";
+
+                if(util.Re.rMatches(ip,"\\d+\\.\\d+\\.\\d+\\.\\d+")) {
+                    if (crawled.contains(ip + port)) {
+                        logger.info("duplicate item: {}:{}.", ip, port);
+                    } else {
+                        mcoll.insertOne(new Document().append("rate","0/0").append("score", 0.0).append("ip", ip).append("port", Integer.parseInt(port)).append("inserttime", sdf.format(new Date())).append("type", type));
+                        logger.info("inserted item: {}:{}.", ip, port);
+                    }
+                }
+
+            }
+
+            logger.debug("xicidaili");
+        }if(page.getUrl().contains("www.xicidaili")){
+            page.getHtml();
+            Elements eles = page.select("table#ip_list > tr.class");
+            for(Element ele: eles){
+
+
+            }
+
+            logger.debug("xicidaili..");
         }
 
     }

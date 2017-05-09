@@ -23,7 +23,7 @@ public class ProxyUtil {
         try{
             URL url = new URL("https://www.baidu.com");
             URLConnection conn = url.openConnection(proxy);
-            conn.setConnectTimeout(10000);
+            conn.setConnectTimeout(5000);
             conn.setRequestProperty("User-Agent","Mozilla/4.0 (compatible; MSIE 7.0; NT 5.1; GTB5; .NET CLR 2.0.50727; CIBA)");
             conn.getContent();
             return true;
@@ -33,7 +33,7 @@ public class ProxyUtil {
         try{
             URL url = new URL("https://www.sogou.com/");
             URLConnection conn = url.openConnection(proxy);
-            conn.setConnectTimeout(10000);
+            conn.setConnectTimeout(5000);
             conn.setRequestProperty("User-Agent","Mozilla/4.0 (compatible; MSIE 7.0; NT 5.1; GTB5; .NET CLR 2.0.50727; CIBA)");
             conn.getContent();
             return true;
@@ -43,7 +43,7 @@ public class ProxyUtil {
         try{
             URL url = new URL("https://www.taobao.com/");
             URLConnection conn = url.openConnection(proxy);
-            conn.setConnectTimeout(10000);
+            conn.setConnectTimeout(5000);
             conn.setRequestProperty("User-Agent","Mozilla/4.0 (compatible; MSIE 7.0; NT 5.1; GTB5; .NET CLR 2.0.50727; CIBA)");
             conn.getContent();
             return true;
@@ -53,7 +53,7 @@ public class ProxyUtil {
         try{
             URL url = new URL("http://www.qq.com/");
             URLConnection conn = url.openConnection(proxy);
-            conn.setConnectTimeout(10000);
+            conn.setConnectTimeout(5000);
             conn.setRequestProperty("User-Agent","Mozilla/4.0 (compatible; MSIE 7.0; NT 5.1; GTB5; .NET CLR 2.0.50727; CIBA)");
             conn.getContent();
             return true;
