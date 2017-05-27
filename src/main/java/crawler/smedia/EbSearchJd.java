@@ -13,15 +13,12 @@ import org.jsoup.select.Elements;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.support.rowset.SqlRowSet;
-import util.MD5;
+import utils.StringUtil;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.sql.Date;
-import java.sql.SQLException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -145,7 +142,7 @@ public class EbSearchJd extends BaseCrawler<EbData> {
             String searchKeywordFromMeta = page.getMetaData().get("search_keyword");
 
             String url = formatUrl(element.select("div.p-img>a").attr("href"));
-            if (crawledItems.contains(MD5.MD5(url))) {
+            if (crawledItems.contains(StringUtil.MD5(url))) {
                 logger.info("skip crawled item {}", url);
                 continue;
             }
@@ -192,7 +189,7 @@ public class EbSearchJd extends BaseCrawler<EbData> {
 
         String info;
         String url = page.getUrl();
-        String md5 = MD5.MD5(url);
+        String md5 = StringUtil.MD5(url);
         String code_num = "";
         String model = "";
         String year_month = getYearMonth();

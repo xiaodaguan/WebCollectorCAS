@@ -8,13 +8,12 @@ import com.mongodb.MongoClient;
 import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
-import crawler.BaseCrawler;
-import data.SimpleData;
 import org.bson.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import utils.StringUtil;
 
 import java.io.UnsupportedEncodingException;
 import java.text.SimpleDateFormat;
@@ -122,7 +121,7 @@ public class IPProxyCrawler extends BreadthCrawler {
                     String loc = ele.select("td:nth-child(5)").first().text();
                     String speed = ele.select("td:nth-child(6)").first().text();
 
-                    if(util.Re.rMatches(ip,"\\d+\\.\\d+\\.\\d+\\.\\d+")) {
+                    if(StringUtil.rMatches(ip,"\\d+\\.\\d+\\.\\d+\\.\\d+")) {
                         if (crawled.contains(ip + port)) {
                             logger.info("duplicate item: {}:{}.", ip, port);
                         } else {
@@ -144,7 +143,7 @@ public class IPProxyCrawler extends BreadthCrawler {
                 String port = line.split(":")[1];
                 String type = "unknown";
 
-                if(util.Re.rMatches(ip,"\\d+\\.\\d+\\.\\d+\\.\\d+")) {
+                if(StringUtil.rMatches(ip,"\\d+\\.\\d+\\.\\d+\\.\\d+")) {
                     if (crawled.contains(ip + port)) {
                         logger.info("duplicate item: {}:{}.", ip, port);
                     } else {

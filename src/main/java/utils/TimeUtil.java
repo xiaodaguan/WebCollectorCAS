@@ -1,4 +1,4 @@
-package util;
+package utils;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -9,7 +9,7 @@ import java.util.Date;
 /**
  * Created by guanxiaoda on 5/25/16.
  */
-public class Time {
+public class TimeUtil {
 
     private static SimpleDateFormat sdf1 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     private static SimpleDateFormat sdf2 = new SimpleDateFormat("yyyy-MM-dd");
@@ -44,11 +44,11 @@ public class Time {
      * @return
      */
     public static Date timeFormat(String timeRaw) {
-        if (Re.rMatches(timeRaw, "\\d+[\\u4e00-\\u9fa5]+前")) {
+        if (StringUtil.rMatches(timeRaw, "\\d+[\\u4e00-\\u9fa5]+前")) {
             Calendar calendar = Calendar.getInstance();
             calendar.setTime(new Date());
-            int num = Integer.parseInt(Re.rExtract(timeRaw, "\\d+"));
-            String unit = Re.rExtract(timeRaw, "[\\u4e00-\\u9fa5]+前").replace("前", "");
+            int num = Integer.parseInt(StringUtil.rExtract(timeRaw, "\\d+"));
+            String unit = StringUtil.rExtract(timeRaw, "[\\u4e00-\\u9fa5]+前").replace("前", "");
             if (unit.equals("秒") || unit.equals("秒钟")) calendar.add(Calendar.SECOND, -num);
             if (unit.equals("分") || unit.equals("分钟")) calendar.add(Calendar.MINUTE, -num);
             if (unit.equals("天")) calendar.add(Calendar.DAY_OF_YEAR, -num);
@@ -58,7 +58,7 @@ public class Time {
 
             for (SimpleDateFormat sdf : sdfs) {
                 try {
-                    synchronized (Time.class) {
+                    synchronized (TimeUtil.class) {
                         return sdf.parse(timeRaw);
                     }
                 } catch (ParseException e) { }

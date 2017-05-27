@@ -6,10 +6,7 @@ import cn.edu.hfut.dmic.webcollector.model.Page;
 import cn.edu.hfut.dmic.webcollector.net.HttpRequest;
 import cn.edu.hfut.dmic.webcollector.net.HttpResponse;
 import crawler.BaseCrawler;
-import crawler.smedia.EbSearchJd;
-import data.EbData;
 import data.ScholarData;
-import data.SearchKeyInfo;
 import db.DataPersistence;
 import db.JDBCHelper;
 import org.jsoup.nodes.Element;
@@ -17,10 +14,9 @@ import org.jsoup.select.Elements;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.JdbcTemplate;
-import util.MD5;
+import utils.StringUtil;
 
 import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.sql.Date;
 import java.util.ArrayList;
 import java.util.List;
@@ -289,7 +285,7 @@ public class SciencechinaJournal extends BaseCrawler<ScholarData> {
 //            String searchKeywordFromMeta = page.getMetaData().get("search_keyword");
 //
 ////            String url = formatUrl(element.select("div.p-img>a").attr("href"));
-//            if (crawledItems.contains(MD5.MD5(url))) {
+//            if (crawledItems.contains(StringUtil.StringUtil(url))) {
 //                logger.info("skip crawled item {}", url);
 //                continue;
 //            }
@@ -316,7 +312,7 @@ public class SciencechinaJournal extends BaseCrawler<ScholarData> {
             crawlDatum.meta("pageType", "DETAIL");
             crawlDatum.meta("searchKeywordInfo", ski);
 
-            if (crawledItems.contains(MD5.MD5(url))) {
+            if (crawledItems.contains(StringUtil.MD5(url))) {
                 logger.info("drop crawled item[{}]", url);
             }
             else {
@@ -341,7 +337,7 @@ public class SciencechinaJournal extends BaseCrawler<ScholarData> {
 
         Element citeE = page.select("#body_con_cr > table.table_s2 > thead > tr > th ", 0);
         String citeStr = citeE.text();
-        String countStr = util.Re.rExtract(citeStr, "\\d+");
+        String countStr = StringUtil.rExtract(citeStr, "\\d+");
         int citeCount = Integer.parseInt(countStr);
         String citeUrl = citeE.attr("href");
 
@@ -402,7 +398,7 @@ public class SciencechinaJournal extends BaseCrawler<ScholarData> {
         sd.setSubject(subject);
         sd.setFund(fund);
 
-        sd.setMd5(MD5.MD5(sd.getUrl()));
+        sd.setMd5(StringUtil.MD5(sd.getUrl()));
 
         logger.info("[detail] paper{} parsed.", pageTitle);
         return sd;

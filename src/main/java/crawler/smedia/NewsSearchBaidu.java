@@ -16,9 +16,8 @@ import org.jsoup.select.Elements;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.JdbcTemplate;
-import util.MD5;
-import util.Re;
-import util.Time;
+import utils.StringUtil;
+import utils.TimeUtil;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
@@ -103,7 +102,7 @@ public class NewsSearchBaidu extends BaseCrawler<NewsData> {
 
     @Override
     protected void paging(Page page, CrawlDatums crawlDatums) {
-        String currPnStr = Re.rExtract(page.getUrl(), "&pn=\\d+");
+        String currPnStr = StringUtil.rExtract(page.getUrl(), "&pn=\\d+");
         String nextUrl;
         if (currPnStr != null) {
             int currPn = Integer.parseInt(currPnStr.replace("&pn=", ""));
@@ -144,11 +143,11 @@ public class NewsSearchBaidu extends BaseCrawler<NewsData> {
             String source = source_time.split("  ")[0];
             String timeStr = source_time.split("  ")[1];
             String sameUrl = null;
-            sameNumStr = Re.rExtract(sameNumStr, "\\d+");
+            sameNumStr = StringUtil.rExtract(sameNumStr, "\\d+");
             if (sameNumStr != null)//如果没有相同新闻数则不抽取相同新闻url
                 sameUrl = "http://news.baidu.com" + element.select("div>span>a:nth-child(1)").attr("href");
 
-            if (crawledItems.contains(MD5.MD5(url))) {
+            if (crawledItems.contains(StringUtil.MD5(url))) {
                 logger.info("skip requesting crawled item {}", url);
                 continue;
             }
@@ -192,7 +191,7 @@ public class NewsSearchBaidu extends BaseCrawler<NewsData> {
             e.printStackTrace();
         }
 
-        java.util.Date pubdate = Time.timeFormat(pubtimeRaw);
+        java.util.Date pubdate = TimeUtil.timeFormat(pubtimeRaw);
 
         NewsData nsData = new NewsData();
         nsData.setTitle(title);
@@ -206,7 +205,7 @@ public class NewsSearchBaidu extends BaseCrawler<NewsData> {
 
         nsData.setSearchKeyword(search_keyword);
         nsData.setCategoryCode(category_code);
-        nsData.setMd5(MD5.MD5(nsData.getUrl()));
+        nsData.setMd5(StringUtil.MD5(nsData.getUrl()));
 
         return nsData;
     }

@@ -10,8 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementSetter;
-import org.springframework.jdbc.support.rowset.SqlRowSet;
-import util.Re;
+import utils.StringUtil;
 
 import java.math.BigDecimal;
 import java.sql.Date;
@@ -126,7 +125,7 @@ public class BaiduHotKeyCrawler extends BreadthCrawler {
             int i = 0;
             for (Element el : indexList) {
                 String value = el.text();
-                if (Re.rMatches(value, "\\d+")) results.get(i).setSearchIndex(Integer.parseInt(value));
+                if (StringUtil.rMatches(value, "\\d+")) results.get(i).setSearchIndex(Integer.parseInt(value));
 
                 if (el.hasClass("icon-rise")) results.get(i).setTrend(1);
                 else if (el.hasClass("icon-fall")) results.get(i).setTrend(-1);

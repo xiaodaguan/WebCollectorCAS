@@ -1,4 +1,4 @@
-package util;
+package utils;
 
 import java.io.*;
 
@@ -6,7 +6,7 @@ import java.io.*;
  * Created by guanxiaoda on 6/7/16.
  *
  */
-public class File {
+public class FileUtil {
 
 
     public synchronized static void writeTxt(String fileName, String content) throws IOException {

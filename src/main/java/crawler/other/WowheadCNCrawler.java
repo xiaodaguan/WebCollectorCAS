@@ -11,21 +11,10 @@ import com.mongodb.client.MongoDatabase;
 import crawler.BaseCrawler;
 import data.SearchKeyInfo;
 import data.WowItemData;
-import org.apache.xpath.XPathAPI;
-import org.jdom.Document;
-import org.jdom.JDOMException;
-import org.jdom.input.SAXBuilder;
-import org.jsoup.select.Elements;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xml.sax.InputSource;
+import utils.StringUtil;
 
-import javax.swing.*;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import java.io.IOException;
-import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -92,9 +81,9 @@ public class WowheadCNCrawler extends BaseCrawler<WowItemData>{
         logger.info("visiting page {}...", title);
 
         if(!page.getUrl().contains("/item=")) {
-            List<String> itemIds = util.Re.rExtractList(page.getHtml(), "\"id\":\\d+,\"level\":");
+            List<String> itemIds = StringUtil.rExtractList(page.getHtml(), "\"id\":\\d+,\"level\":");
             for (String itemId : itemIds) {
-                String id = util.Re.rExtract(itemId, "\\d+");
+                String id = StringUtil.rExtract(itemId, "\\d+");
                 String url = "http://cn.wowhead.com/item=" + id;
 
                 if(crawled.contains(url)){
@@ -107,15 +96,15 @@ public class WowheadCNCrawler extends BaseCrawler<WowItemData>{
         }else{
 
             String name = title;
-            String tooltip = util.Re.rExtract(page.getHtml(),"tooltip_zhcn = '.*'");
-            String getResource = util.Re.rExtract(page.getHtml(),"new Listview.*created-by.*;");
+            String tooltip = StringUtil.rExtract(page.getHtml(),"tooltip_zhcn = '.*'");
+            String getResource = StringUtil.rExtract(page.getHtml(),"new Listview.*created-by.*;");
             if (getResource == null) {
-                getResource = util.Re.rExtract(page.getHtml(),"new Listview.*reward-from.*;");
+                getResource = StringUtil.rExtract(page.getHtml(),"new Listview.*reward-from.*;");
             }else{
                 getResource = "制造:"+getResource;
             }
             if (getResource == null) {
-                getResource = util.Re.rExtract(page.getHtml(),"new Listview.*dropped-by.*;");
+                getResource = StringUtil.rExtract(page.getHtml(),"new Listview.*dropped-by.*;");
             }{
                 getResource = "任务:"+getResource;
             }

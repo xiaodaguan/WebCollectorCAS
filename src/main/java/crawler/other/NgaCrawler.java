@@ -11,9 +11,6 @@ import com.mongodb.MongoClient;
 import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
-import crawler.BaseCrawler;
-import data.SimpleData;
-import org.bson.BsonDocument;
 import org.bson.Document;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Element;
@@ -21,11 +18,8 @@ import org.jsoup.select.Elements;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import us.codecraft.xsoup.Xsoup;
+import utils.TimeUtil;
 
-import java.sql.Date;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.HashSet;
 
 /**
@@ -120,7 +114,7 @@ public class NgaCrawler extends BreadthCrawler {
             String repCount = page.meta("repCount");
             Integer repNum = Integer.parseInt(repCount);
             String pubtime = page.meta("pubtime");
-            pubtime = util.Time.timeFormat(pubtime).toString();
+            pubtime = TimeUtil.timeFormat(pubtime).toString();
             /**
              *
              */

@@ -6,7 +6,7 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import util.File;
+import utils.FileUtil;
 
 import java.io.IOException;
 
@@ -57,7 +57,7 @@ public class test {
 
         driverWait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector("a[suda-uatrack*=ordinary_login]")));
         try {
-            File.writeTxt("tmphtml/tmp.html", driver.getPageSource());
+            FileUtil.writeTxt("tmphtml/tmp.html", driver.getPageSource());
         } catch (IOException e) {
             e.printStackTrace();
         }

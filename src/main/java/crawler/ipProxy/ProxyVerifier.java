@@ -5,8 +5,6 @@ import org.bson.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.rmi.CORBA.Util;
-
 /**
  * Created by guanxiaoda on 17/5/3.
  * score: succ/total
@@ -37,7 +35,7 @@ public class ProxyVerifier implements Runnable {
         int succCount = Integer.parseInt(rate.split("/")[0]);
         int testCount = Integer.parseInt(rate.split("/")[1]);
 
-        if(util.ProxyUtil.verify(ip,port)){
+        if(utils.ProxyUtil.verify(ip,port)){
             logger.info("[√]proxy alive: {}:{}",ip,port);
             succCount++;
         }else{
